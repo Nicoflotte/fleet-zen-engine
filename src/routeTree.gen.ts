@@ -10,12 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AffectationsRouteImport } from './routes/affectations'
+import { Route as AgencesRouteImport } from './routes/agences'
+import { Route as EquipementsRouteImport } from './routes/equipements'
+import { Route as ConducteursIndexRouteImport } from './routes/conducteurs.index'
+import { Route as ConducteursDriverIdRouteImport } from './routes/conducteurs.$driverId'
 import { Route as VehiculesIndexRouteImport } from './routes/vehicules.index'
 import { Route as VehiculesVehicleIdRouteImport } from './routes/vehicules.$vehicleId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffectationsRoute = AffectationsRouteImport.update({
+  id: '/affectations',
+  path: '/affectations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgencesRoute = AgencesRouteImport.update({
+  id: '/agences',
+  path: '/agences',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipementsRoute = EquipementsRouteImport.update({
+  id: '/equipements',
+  path: '/equipements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConducteursIndexRoute = ConducteursIndexRouteImport.update({
+  id: '/conducteurs/',
+  path: '/conducteurs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConducteursDriverIdRoute = ConducteursDriverIdRouteImport.update({
+  id: '/conducteurs/$driverId',
+  path: '/conducteurs/$driverId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VehiculesIndexRoute = VehiculesIndexRouteImport.update({
@@ -31,31 +61,76 @@ const VehiculesVehicleIdRoute = VehiculesVehicleIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/affectations': typeof AffectationsRoute
+  '/agences': typeof AgencesRoute
+  '/equipements': typeof EquipementsRoute
+  '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
+  '/conducteurs/': typeof ConducteursIndexRoute
   '/vehicules/': typeof VehiculesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/affectations': typeof AffectationsRoute
+  '/agences': typeof AgencesRoute
+  '/equipements': typeof EquipementsRoute
+  '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
+  '/conducteurs': typeof ConducteursIndexRoute
   '/vehicules': typeof VehiculesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/affectations': typeof AffectationsRoute
+  '/agences': typeof AgencesRoute
+  '/equipements': typeof EquipementsRoute
+  '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
+  '/conducteurs/': typeof ConducteursIndexRoute
   '/vehicules/': typeof VehiculesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/vehicules/$vehicleId' | '/vehicules/'
+  fullPaths:
+    | '/'
+    | '/affectations'
+    | '/agences'
+    | '/equipements'
+    | '/conducteurs/$driverId'
+    | '/vehicules/$vehicleId'
+    | '/conducteurs/'
+    | '/vehicules/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/vehicules/$vehicleId' | '/vehicules'
-  id: '__root__' | '/' | '/vehicules/$vehicleId' | '/vehicules/'
+  to:
+    | '/'
+    | '/affectations'
+    | '/agences'
+    | '/equipements'
+    | '/conducteurs/$driverId'
+    | '/vehicules/$vehicleId'
+    | '/conducteurs'
+    | '/vehicules'
+  id:
+    | '__root__'
+    | '/'
+    | '/affectations'
+    | '/agences'
+    | '/equipements'
+    | '/conducteurs/$driverId'
+    | '/vehicules/$vehicleId'
+    | '/conducteurs/'
+    | '/vehicules/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AffectationsRoute: typeof AffectationsRoute
+  AgencesRoute: typeof AgencesRoute
+  EquipementsRoute: typeof EquipementsRoute
+  ConducteursDriverIdRoute: typeof ConducteursDriverIdRoute
   VehiculesVehicleIdRoute: typeof VehiculesVehicleIdRoute
+  ConducteursIndexRoute: typeof ConducteursIndexRoute
   VehiculesIndexRoute: typeof VehiculesIndexRoute
 }
 
@@ -66,6 +141,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affectations': {
+      id: '/affectations'
+      path: '/affectations'
+      fullPath: '/affectations'
+      preLoaderRoute: typeof AffectationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agences': {
+      id: '/agences'
+      path: '/agences'
+      fullPath: '/agences'
+      preLoaderRoute: typeof AgencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipements': {
+      id: '/equipements'
+      path: '/equipements'
+      fullPath: '/equipements'
+      preLoaderRoute: typeof EquipementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conducteurs/': {
+      id: '/conducteurs/'
+      path: '/conducteurs'
+      fullPath: '/conducteurs/'
+      preLoaderRoute: typeof ConducteursIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conducteurs/$driverId': {
+      id: '/conducteurs/$driverId'
+      path: '/conducteurs/$driverId'
+      fullPath: '/conducteurs/$driverId'
+      preLoaderRoute: typeof ConducteursDriverIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vehicules/': {
@@ -87,7 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AffectationsRoute: AffectationsRoute,
+  AgencesRoute: AgencesRoute,
+  EquipementsRoute: EquipementsRoute,
+  ConducteursDriverIdRoute: ConducteursDriverIdRoute,
   VehiculesVehicleIdRoute: VehiculesVehicleIdRoute,
+  ConducteursIndexRoute: ConducteursIndexRoute,
   VehiculesIndexRoute: VehiculesIndexRoute,
 }
 export const routeTree = rootRouteImport

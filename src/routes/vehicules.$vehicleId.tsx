@@ -26,6 +26,7 @@ import {
   statusTone,
   vehicles,
 } from "@/lib/fleet-data";
+import { equipmentLabels, useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/vehicules/$vehicleId")({
   loader: ({ params }) => {
@@ -86,7 +87,11 @@ const documents = [
 ];
 
 function VehicleDetail() {
-  const { vehicle } = Route.useLoaderData();
+  const { vehicle: seed } = Route.useLoaderData();
+  const { vehicles, drivers, equipments } = useFleet();
+  const vehicle = vehicles.find((item) => item.id === seed.id) ?? seed;
+  const linkedDriver = drivers.find((d) => d.vehicleId === vehicle.id) ?? null;
+  const linkedEquipments = equipments.filter((e) => e.vehicleId === vehicle.id);
 
   const facts = [
     { icon: MapPin, label: "Agence", value: vehicle.agency },
@@ -136,6 +141,33 @@ function VehicleDetail() {
             </ul>
           </section>
         )}
+
+        <section className="panel space-y-2 p-5">
+          <p className="text-sm font-semibold">Affectation liée</p>
+          <p className="text-sm text-muted-foreground">
+            Conducteur :{" "}
+            {linkedDriver ? (
+              <Link
+                to="/conducteurs/$driverId"
+                params={{ driverId: linkedDriver.id }}
+                className="font-medium text-foreground hover:text-accent"
+              >
+                {linkedDriver.firstName} {linkedDriver.lastName}
+              </Link>
+            ) : (
+              "non affecté"
+            )}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Équipements :{" "}
+            {linkedEquipments.length
+              ? linkedEquipments.map((e) => `${equipmentLabels[e.type]} ${e.reference}`).join(" · ")
+              : "aucun"}
+          </p>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/affectations">Gérer l'affectation</Link>
+          </Button>
+        </section>
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {facts.map((fact) => (

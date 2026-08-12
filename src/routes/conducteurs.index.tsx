@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, SlidersHorizontal, Plus, FileDown, CarFront } from "lucide-react";
+import { FileDown, Search, SlidersHorizontal, UserRound } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
+import { DriverFormDialog } from "@/components/driver-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,60 +22,53 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { shortDate } from "@/lib/fleet-data";
 import {
-  currency,
-  number,
-  shortDate,
-  statusLabels,
-  statusTone,
-  type VehicleStatus,
-} from "@/lib/fleet-data";
-import { useFleet } from "@/lib/fleet-store";
+  driverStatusLabels,
+  driverStatusTone,
+  useFleet,
+  type DriverStatus,
+} from "@/lib/fleet-store";
 
-export const Route = createFileRoute("/vehicules/")({
+export const Route = createFileRoute("/conducteurs/")({
   head: () => ({
     meta: [
-      { title: "Parc véhicules — FleetManager AI" },
+      { title: "Conducteurs — FleetManager AI" },
       {
         name: "description",
         content:
-          "Liste complète du parc : recherche, filtres par statut, agence et énergie, coûts et échéances par véhicule.",
+          "Annuaire des conducteurs : identité, permis de conduire, adresse postale, agence et véhicule affecté.",
       },
-      { property: "og:title", content: "Parc véhicules — FleetManager AI" },
+      { property: "og:title", content: "Conducteurs — FleetManager AI" },
       {
         property: "og:description",
-        content: "Recherchez, filtrez et pilotez l'ensemble des véhicules de la flotte.",
+        content: "Créez un conducteur manuellement ou par reconnaissance du permis de conduire.",
       },
     ],
   }),
-  component: VehiclesList,
+  component: DriversList,
 });
 
-function VehiclesList() {
-  const { vehicles } = useFleet();
+function DriversList() {
+  const { drivers, agencies, agencyName, vehicleLabel } = useFleet();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<VehicleStatus | "all">("all");
+  const [status, setStatus] = useState<DriverStatus | "all">("all");
   const [agency, setAgency] = useState("all");
-
-  const agencies = useMemo(
-    () => Array.from(new Set(vehicles.map((v) => v.agency))).sort(),
-    [vehicles],
-  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return vehicles.filter((vehicle) => {
+    return drivers.filter((driver) => {
       const matchesQuery =
         q.length === 0 ||
-        [vehicle.plate, vehicle.brand, vehicle.model, vehicle.id, vehicle.driver ?? ""]
+        [driver.firstName, driver.lastName, driver.id, driver.licenseNumber, driver.city]
           .join(" ")
           .toLowerCase()
           .includes(q);
-      const matchesStatus = status === "all" || vehicle.status === status;
-      const matchesAgency = agency === "all" || vehicle.agency === agency;
+      const matchesStatus = status === "all" || driver.status === status;
+      const matchesAgency = agency === "all" || driver.agencyId === agency;
       return matchesQuery && matchesStatus && matchesAgency;
     });
-  }, [vehicles, query, status, agency]);
+  }, [drivers, query, status, agency]);
 
   const resetFilters = () => {
     setQuery("");
@@ -82,19 +76,20 @@ function VehiclesList() {
     setAgency("all");
   };
 
+  const expiringSoon = (value: string) =>
+    new Date(value).getTime() - Date.now() < 1000 * 60 * 60 * 24 * 90;
+
   return (
     <>
       <PageHeader
-        title="Parc véhicules"
-        subtitle={`${vehicles.length} véhicules dans le périmètre courant`}
+        title="Conducteurs"
+        subtitle={`${drivers.length} conducteurs rattachés au périmètre courant`}
         actions={
           <>
             <Button variant="outline" size="sm">
               <FileDown /> Export Excel
             </Button>
-            <Button size="sm">
-              <Plus /> Ajouter un véhicule
-            </Button>
+            <DriverFormDialog />
           </>
         }
       />
@@ -106,19 +101,19 @@ function VehiclesList() {
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Immatriculation, marque, modèle, conducteur…"
+              placeholder="Nom, prénom, n° de permis, ville…"
               className="pl-9"
-              aria-label="Rechercher un véhicule"
+              aria-label="Rechercher un conducteur"
             />
           </div>
 
-          <Select value={status} onValueChange={(value) => setStatus(value as VehicleStatus | "all")}>
+          <Select value={status} onValueChange={(value) => setStatus(value as DriverStatus | "all")}>
             <SelectTrigger className="w-44" aria-label="Filtrer par statut">
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les statuts</SelectItem>
-              {Object.entries(statusLabels).map(([value, label]) => (
+              {Object.entries(driverStatusLabels).map(([value, label]) => (
                 <SelectItem key={value} value={value}>
                   {label}
                 </SelectItem>
@@ -133,8 +128,8 @@ function VehiclesList() {
             <SelectContent>
               <SelectItem value="all">Toutes les agences</SelectItem>
               {agencies.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -156,10 +151,10 @@ function VehiclesList() {
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
               <span className="grid size-12 place-items-center rounded-full bg-muted text-muted-foreground">
-                <CarFront className="size-6" />
+                <UserRound className="size-6" />
               </span>
               <div>
-                <p className="text-sm font-semibold">Aucun véhicule ne correspond</p>
+                <p className="text-sm font-semibold">Aucun conducteur ne correspond</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Ajustez la recherche ou réinitialisez les filtres.
                 </p>
@@ -173,46 +168,55 @@ function VehiclesList() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Véhicule</TableHead>
-                    <TableHead>Immatriculation</TableHead>
-                    <TableHead>Agence</TableHead>
                     <TableHead>Conducteur</TableHead>
+                    <TableHead>Agence</TableHead>
+                    <TableHead>Véhicule affecté</TableHead>
+                    <TableHead>Permis</TableHead>
+                    <TableHead>Validité permis</TableHead>
+                    <TableHead>Ville</TableHead>
                     <TableHead>Statut</TableHead>
-                    <TableHead className="text-right">Km</TableHead>
-                    <TableHead className="text-right">Coût / mois</TableHead>
-                    <TableHead>Fin de contrat</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((vehicle) => (
-                    <TableRow key={vehicle.id} className="cursor-pointer">
+                  {filtered.map((driver) => (
+                    <TableRow key={driver.id} className="cursor-pointer">
                       <TableCell className="font-medium">
                         <Link
-                          to="/vehicules/$vehicleId"
-                          params={{ vehicleId: vehicle.id }}
+                          to="/conducteurs/$driverId"
+                          params={{ driverId: driver.id }}
                           className="block hover:text-accent"
                         >
-                          {vehicle.brand} {vehicle.model}
+                          {driver.firstName} {driver.lastName}
                           <span className="block text-xs font-normal text-muted-foreground">
-                            {vehicle.category} · {vehicle.energy}
+                            {driver.id} ·{" "}
+                            {driver.source === "ocr_permis" ? "Permis reconnu" : "Saisie manuelle"}
                           </span>
                         </Link>
                       </TableCell>
-                      <TableCell className="tabular">{vehicle.plate}</TableCell>
-                      <TableCell>{vehicle.agency}</TableCell>
+                      <TableCell>{agencyName(driver.agencyId)}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {vehicle.driver ?? "Non affecté"}
+                        {vehicleLabel(driver.vehicleId)}
+                      </TableCell>
+                      <TableCell className="tabular">
+                        {driver.licenseNumber}
+                        <span className="block text-xs text-muted-foreground">
+                          {driver.licenseCategories}
+                        </span>
+                      </TableCell>
+                      <TableCell className="tabular">
+                        {shortDate(driver.licenseExpiry)}
+                        {expiringSoon(driver.licenseExpiry) && (
+                          <span className="block text-xs text-warning-foreground">À revalider</span>
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={statusTone[vehicle.status]}>
-                          {statusLabels[vehicle.status]}
+                        {driver.postalCode} {driver.city}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={driverStatusTone[driver.status]}>
+                          {driverStatusLabels[driver.status]}
                         </Badge>
                       </TableCell>
-                      <TableCell className="tabular text-right">{number(vehicle.km)}</TableCell>
-                      <TableCell className="tabular text-right">
-                        {vehicle.monthlyCost ? currency(vehicle.monthlyCost) : "—"}
-                      </TableCell>
-                      <TableCell className="tabular">{shortDate(vehicle.contractEnd)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
