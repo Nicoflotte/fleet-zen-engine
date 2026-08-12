@@ -9,6 +9,9 @@ import {
   Sparkle,
   Settings,
   Plug,
+  Building2,
+  CreditCard,
+  Link2,
 } from "lucide-react";
 
 import {
@@ -28,7 +31,10 @@ import {
 const fleetItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard, ready: true },
   { title: "Parc véhicules", url: "/vehicules", icon: Car, ready: true },
-  { title: "Conducteurs", url: "/conducteurs", icon: Users, ready: false },
+  { title: "Conducteurs", url: "/conducteurs", icon: Users, ready: true },
+  { title: "Agences", url: "/agences", icon: Building2, ready: true },
+  { title: "Équipements", url: "/equipements", icon: CreditCard, ready: true },
+  { title: "Affectations", url: "/affectations", icon: Link2, ready: true },
   { title: "Maintenance", url: "/maintenance", icon: Wrench, ready: false },
 ];
 
