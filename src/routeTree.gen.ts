@@ -15,6 +15,7 @@ import { Route as AgencesRouteImport } from './routes/agences'
 import { Route as AlertesRouteImport } from './routes/alertes'
 import { Route as AssurancesRouteImport } from './routes/assurances'
 import { Route as ContraventionsRouteImport } from './routes/contraventions'
+import { Route as CreditsBauxRouteImport } from './routes/credits-baux'
 import { Route as DepensesRouteImport } from './routes/depenses'
 import { Route as EquipementsRouteImport } from './routes/equipements'
 import { Route as LocationsRouteImport } from './routes/locations'
@@ -52,6 +53,11 @@ const AssurancesRoute = AssurancesRouteImport.update({
 const ContraventionsRoute = ContraventionsRouteImport.update({
   id: '/contraventions',
   path: '/contraventions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsBauxRoute = CreditsBauxRouteImport.update({
+  id: '/credits-baux',
+  path: '/credits-baux',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DepensesRoute = DepensesRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/alertes': typeof AlertesRoute
   '/assurances': typeof AssurancesRoute
   '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/locations': typeof LocationsRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/alertes': typeof AlertesRoute
   '/assurances': typeof AssurancesRoute
   '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/locations': typeof LocationsRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/alertes': typeof AlertesRoute
   '/assurances': typeof AssurancesRoute
   '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/locations': typeof LocationsRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/alertes'
     | '/assurances'
     | '/contraventions'
+    | '/credits-baux'
     | '/depenses'
     | '/equipements'
     | '/locations'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/alertes'
     | '/assurances'
     | '/contraventions'
+    | '/credits-baux'
     | '/depenses'
     | '/equipements'
     | '/locations'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/alertes'
     | '/assurances'
     | '/contraventions'
+    | '/credits-baux'
     | '/depenses'
     | '/equipements'
     | '/locations'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   AlertesRoute: typeof AlertesRoute
   AssurancesRoute: typeof AssurancesRoute
   ContraventionsRoute: typeof ContraventionsRoute
+  CreditsBauxRoute: typeof CreditsBauxRoute
   DepensesRoute: typeof DepensesRoute
   EquipementsRoute: typeof EquipementsRoute
   LocationsRoute: typeof LocationsRoute
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/contraventions'
       fullPath: '/contraventions'
       preLoaderRoute: typeof ContraventionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits-baux': {
+      id: '/credits-baux'
+      path: '/credits-baux'
+      fullPath: '/credits-baux'
+      preLoaderRoute: typeof CreditsBauxRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/depenses': {
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlertesRoute: AlertesRoute,
   AssurancesRoute: AssurancesRoute,
   ContraventionsRoute: ContraventionsRoute,
+  CreditsBauxRoute: CreditsBauxRoute,
   DepensesRoute: DepensesRoute,
   EquipementsRoute: EquipementsRoute,
   LocationsRoute: LocationsRoute,
