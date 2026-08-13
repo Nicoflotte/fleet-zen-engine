@@ -1,17 +1,22 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  Car,
-  LayoutDashboard,
-  Users,
-  Wrench,
-  FolderOpen,
   BarChart3,
-  Sparkle,
-  Settings,
-  Plug,
   Building2,
+  Car,
+  CarFront,
   CreditCard,
+  FileWarning,
+  FolderOpen,
+  Landmark,
+  LayoutDashboard,
   Link2,
+  Plug,
+  Receipt,
+  Settings,
+  ShieldAlert,
+  Sparkle,
+  Umbrella,
+  Users,
 } from "lucide-react";
 
 import {
@@ -28,23 +33,33 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const fleetItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard, ready: true },
+type NavItem = { title: string; url: string; icon: typeof Car; ready: boolean };
+
+const fleetItems: NavItem[] = [
+  { title: "Tableau de bord", url: "/", icon: LayoutDashboard, ready: true },
+  { title: "Agences", url: "/agences", icon: Building2, ready: true },
   { title: "Parc véhicules", url: "/vehicules", icon: Car, ready: true },
   { title: "Conducteurs", url: "/conducteurs", icon: Users, ready: true },
-  { title: "Agences", url: "/agences", icon: Building2, ready: true },
   { title: "Équipements", url: "/equipements", icon: CreditCard, ready: true },
   { title: "Affectations", url: "/affectations", icon: Link2, ready: true },
-  { title: "Maintenance", url: "/maintenance", icon: Wrench, ready: false },
 ];
 
-const pilotageItems = [
+const suiviItems: NavItem[] = [
+  { title: "Dépenses", url: "/depenses", icon: Receipt, ready: true },
+  { title: "Locations", url: "/locations", icon: CarFront, ready: true },
+  { title: "Sinistres", url: "/sinistres", icon: ShieldAlert, ready: true },
+  { title: "Contraventions", url: "/contraventions", icon: FileWarning, ready: true },
+  { title: "Assurances", url: "/assurances", icon: Umbrella, ready: true },
+  { title: "Crédits-baux", url: "/credits-baux", icon: Landmark, ready: true },
+];
+
+const pilotageItems: NavItem[] = [
+  { title: "Alertes", url: "/alertes", icon: Sparkle, ready: true },
   { title: "GED", url: "/ged", icon: FolderOpen, ready: false },
   { title: "KPI & Reporting", url: "/kpi", icon: BarChart3, ready: false },
-  { title: "Centre IA", url: "/ia", icon: Sparkle, ready: false },
 ];
 
-const adminItems = [
+const adminItems: NavItem[] = [
   { title: "Administration", url: "/administration", icon: Settings, ready: false },
   { title: "Connecteurs", url: "/connecteurs", icon: Plug, ready: false },
 ];
@@ -57,7 +72,7 @@ export function AppSidebar() {
   const isActive = (url: string) =>
     url === "/" ? pathname === "/" : pathname === url || pathname.startsWith(`${url}/`);
 
-  const renderGroup = (label: string, items: typeof fleetItems) => (
+  const renderGroup = (label: string, items: NavItem[]) => (
     <SidebarGroup>
       <SidebarGroupLabel className="text-[0.68rem] uppercase tracking-[0.14em] text-sidebar-foreground/50">
         {label}
@@ -75,14 +90,14 @@ export function AppSidebar() {
                 ) : (
                   <span
                     className="flex cursor-default items-center gap-3 opacity-55"
-                    title="Écran à concevoir (phase 2)"
+                    title="Écran à concevoir (phase suivante)"
                   >
                     <item.icon className="size-4 shrink-0" />
                     {!collapsed && (
                       <span className="flex w-full items-center justify-between gap-2 truncate">
                         {item.title}
                         <span className="rounded border border-sidebar-border px-1 text-[0.6rem] uppercase">
-                          v1
+                          v2
                         </span>
                       </span>
                     )}
@@ -116,6 +131,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         {renderGroup("Flotte", fleetItems)}
+        {renderGroup("Suivi & coûts", suiviItems)}
         {renderGroup("Pilotage", pilotageItems)}
         {renderGroup("Paramétrage", adminItems)}
       </SidebarContent>

@@ -45,7 +45,7 @@ function AgenciesPage() {
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {agencies.map((agency) => {
             const agencyDrivers = drivers.filter((d) => d.agencyId === agency.id);
-            const agencyVehicles = vehicles.filter((v) => v.agency === agency.name);
+            const agencyVehicles = vehicles.filter((v) => v.agencyId === agency.id);
             const agencyEquipments = equipments.filter((e) =>
               agencyVehicles.some((v) => v.id === e.vehicleId),
             );
@@ -94,7 +94,7 @@ function AgenciesPage() {
                     <TableCell className="text-muted-foreground">{agency.manager}</TableCell>
                     <TableCell className="text-sm">
                       {vehicles
-                        .filter((v) => v.agency === agency.name)
+                        .filter((v) => v.agencyId === agency.id)
                         .map((v) => (
                           <Link
                             key={v.id}

@@ -12,7 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AffectationsRouteImport } from './routes/affectations'
 import { Route as AgencesRouteImport } from './routes/agences'
+import { Route as AlertesRouteImport } from './routes/alertes'
+import { Route as AssurancesRouteImport } from './routes/assurances'
+import { Route as ContraventionsRouteImport } from './routes/contraventions'
+import { Route as CreditsBauxRouteImport } from './routes/credits-baux'
+import { Route as DepensesRouteImport } from './routes/depenses'
 import { Route as EquipementsRouteImport } from './routes/equipements'
+import { Route as LocationsRouteImport } from './routes/locations'
+import { Route as SinistresRouteImport } from './routes/sinistres'
 import { Route as ConducteursIndexRouteImport } from './routes/conducteurs.index'
 import { Route as ConducteursDriverIdRouteImport } from './routes/conducteurs.$driverId'
 import { Route as VehiculesIndexRouteImport } from './routes/vehicules.index'
@@ -33,9 +40,44 @@ const AgencesRoute = AgencesRouteImport.update({
   path: '/agences',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlertesRoute = AlertesRouteImport.update({
+  id: '/alertes',
+  path: '/alertes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssurancesRoute = AssurancesRouteImport.update({
+  id: '/assurances',
+  path: '/assurances',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContraventionsRoute = ContraventionsRouteImport.update({
+  id: '/contraventions',
+  path: '/contraventions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsBauxRoute = CreditsBauxRouteImport.update({
+  id: '/credits-baux',
+  path: '/credits-baux',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepensesRoute = DepensesRouteImport.update({
+  id: '/depenses',
+  path: '/depenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EquipementsRoute = EquipementsRouteImport.update({
   id: '/equipements',
   path: '/equipements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SinistresRoute = SinistresRouteImport.update({
+  id: '/sinistres',
+  path: '/sinistres',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConducteursIndexRoute = ConducteursIndexRouteImport.update({
@@ -63,7 +105,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
+  '/alertes': typeof AlertesRoute
+  '/assurances': typeof AssurancesRoute
+  '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/locations': typeof LocationsRoute
+  '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
   '/conducteurs/': typeof ConducteursIndexRoute
@@ -73,7 +122,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
+  '/alertes': typeof AlertesRoute
+  '/assurances': typeof AssurancesRoute
+  '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/locations': typeof LocationsRoute
+  '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
   '/conducteurs': typeof ConducteursIndexRoute
@@ -84,7 +140,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
+  '/alertes': typeof AlertesRoute
+  '/assurances': typeof AssurancesRoute
+  '/contraventions': typeof ContraventionsRoute
+  '/credits-baux': typeof CreditsBauxRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/locations': typeof LocationsRoute
+  '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
   '/conducteurs/': typeof ConducteursIndexRoute
@@ -96,7 +159,14 @@ export interface FileRouteTypes {
     | '/'
     | '/affectations'
     | '/agences'
+    | '/alertes'
+    | '/assurances'
+    | '/contraventions'
+    | '/credits-baux'
+    | '/depenses'
     | '/equipements'
+    | '/locations'
+    | '/sinistres'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
     | '/conducteurs/'
@@ -106,7 +176,14 @@ export interface FileRouteTypes {
     | '/'
     | '/affectations'
     | '/agences'
+    | '/alertes'
+    | '/assurances'
+    | '/contraventions'
+    | '/credits-baux'
+    | '/depenses'
     | '/equipements'
+    | '/locations'
+    | '/sinistres'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
     | '/conducteurs'
@@ -116,7 +193,14 @@ export interface FileRouteTypes {
     | '/'
     | '/affectations'
     | '/agences'
+    | '/alertes'
+    | '/assurances'
+    | '/contraventions'
+    | '/credits-baux'
+    | '/depenses'
     | '/equipements'
+    | '/locations'
+    | '/sinistres'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
     | '/conducteurs/'
@@ -127,7 +211,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AffectationsRoute: typeof AffectationsRoute
   AgencesRoute: typeof AgencesRoute
+  AlertesRoute: typeof AlertesRoute
+  AssurancesRoute: typeof AssurancesRoute
+  ContraventionsRoute: typeof ContraventionsRoute
+  CreditsBauxRoute: typeof CreditsBauxRoute
+  DepensesRoute: typeof DepensesRoute
   EquipementsRoute: typeof EquipementsRoute
+  LocationsRoute: typeof LocationsRoute
+  SinistresRoute: typeof SinistresRoute
   ConducteursDriverIdRoute: typeof ConducteursDriverIdRoute
   VehiculesVehicleIdRoute: typeof VehiculesVehicleIdRoute
   ConducteursIndexRoute: typeof ConducteursIndexRoute
@@ -157,11 +248,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgencesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alertes': {
+      id: '/alertes'
+      path: '/alertes'
+      fullPath: '/alertes'
+      preLoaderRoute: typeof AlertesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assurances': {
+      id: '/assurances'
+      path: '/assurances'
+      fullPath: '/assurances'
+      preLoaderRoute: typeof AssurancesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contraventions': {
+      id: '/contraventions'
+      path: '/contraventions'
+      fullPath: '/contraventions'
+      preLoaderRoute: typeof ContraventionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits-baux': {
+      id: '/credits-baux'
+      path: '/credits-baux'
+      fullPath: '/credits-baux'
+      preLoaderRoute: typeof CreditsBauxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/depenses': {
+      id: '/depenses'
+      path: '/depenses'
+      fullPath: '/depenses'
+      preLoaderRoute: typeof DepensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/equipements': {
       id: '/equipements'
       path: '/equipements'
       fullPath: '/equipements'
       preLoaderRoute: typeof EquipementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sinistres': {
+      id: '/sinistres'
+      path: '/sinistres'
+      fullPath: '/sinistres'
+      preLoaderRoute: typeof SinistresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/conducteurs/': {
@@ -199,7 +339,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AffectationsRoute: AffectationsRoute,
   AgencesRoute: AgencesRoute,
+  AlertesRoute: AlertesRoute,
+  AssurancesRoute: AssurancesRoute,
+  ContraventionsRoute: ContraventionsRoute,
+  CreditsBauxRoute: CreditsBauxRoute,
+  DepensesRoute: DepensesRoute,
   EquipementsRoute: EquipementsRoute,
+  LocationsRoute: LocationsRoute,
+  SinistresRoute: SinistresRoute,
   ConducteursDriverIdRoute: ConducteursDriverIdRoute,
   VehiculesVehicleIdRoute: VehiculesVehicleIdRoute,
   ConducteursIndexRoute: ConducteursIndexRoute,
