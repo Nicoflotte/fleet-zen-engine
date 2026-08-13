@@ -30,9 +30,9 @@ type DashboardSearch = { month: number; year: number; entity: string };
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): DashboardSearch => ({
-    month: Number(search.month) >= 1 && Number(search.month) <= 12 ? Number(search.month) : 8,
-    year: availableYears.includes(Number(search.year)) ? Number(search.year) : 2026,
-    entity: typeof search.entity === "string" && search.entity ? search.entity : "all",
+    month: Number(search["month"]) >= 1 && Number(search["month"]) <= 12 ? Number(search["month"]) : 8,
+    year: availableYears.includes(Number(search["year"])) ? Number(search["year"]) : 2026,
+    entity: typeof search["entity"] === "string" && search["entity"] ? search["entity"] : "all",
   }),
   head: () => ({
     meta: [
