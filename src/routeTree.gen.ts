@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AffectationsRouteImport } from './routes/affectations'
 import { Route as AgencesRouteImport } from './routes/agences'
 import { Route as AlertesRouteImport } from './routes/alertes'
+import { Route as DepensesRouteImport } from './routes/depenses'
 import { Route as EquipementsRouteImport } from './routes/equipements'
 import { Route as ConducteursIndexRouteImport } from './routes/conducteurs.index'
 import { Route as ConducteursDriverIdRouteImport } from './routes/conducteurs.$driverId'
@@ -37,6 +38,11 @@ const AgencesRoute = AgencesRouteImport.update({
 const AlertesRoute = AlertesRouteImport.update({
   id: '/alertes',
   path: '/alertes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DepensesRoute = DepensesRouteImport.update({
+  id: '/depenses',
+  path: '/depenses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EquipementsRoute = EquipementsRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
   '/alertes': typeof AlertesRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
   '/alertes': typeof AlertesRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/affectations': typeof AffectationsRoute
   '/agences': typeof AgencesRoute
   '/alertes': typeof AlertesRoute
+  '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
   '/vehicules/$vehicleId': typeof VehiculesVehicleIdRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/affectations'
     | '/agences'
     | '/alertes'
+    | '/depenses'
     | '/equipements'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/affectations'
     | '/agences'
     | '/alertes'
+    | '/depenses'
     | '/equipements'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/affectations'
     | '/agences'
     | '/alertes'
+    | '/depenses'
     | '/equipements'
     | '/conducteurs/$driverId'
     | '/vehicules/$vehicleId'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   AffectationsRoute: typeof AffectationsRoute
   AgencesRoute: typeof AgencesRoute
   AlertesRoute: typeof AlertesRoute
+  DepensesRoute: typeof DepensesRoute
   EquipementsRoute: typeof EquipementsRoute
   ConducteursDriverIdRoute: typeof ConducteursDriverIdRoute
   VehiculesVehicleIdRoute: typeof VehiculesVehicleIdRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/alertes'
       fullPath: '/alertes'
       preLoaderRoute: typeof AlertesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/depenses': {
+      id: '/depenses'
+      path: '/depenses'
+      fullPath: '/depenses'
+      preLoaderRoute: typeof DepensesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipements': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   AffectationsRoute: AffectationsRoute,
   AgencesRoute: AgencesRoute,
   AlertesRoute: AlertesRoute,
+  DepensesRoute: DepensesRoute,
   EquipementsRoute: EquipementsRoute,
   ConducteursDriverIdRoute: ConducteursDriverIdRoute,
   VehiculesVehicleIdRoute: VehiculesVehicleIdRoute,
