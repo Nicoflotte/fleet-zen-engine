@@ -88,14 +88,14 @@ const documents = [
 
 function VehicleDetail() {
   const { vehicle: seed } = Route.useLoaderData();
-  const { vehicles, drivers, equipments } = useFleet();
+  const { vehicles, drivers, equipments, agencyName } = useFleet();
   const vehicle = vehicles.find((item) => item.id === seed.id) ?? seed;
   const linkedDriver = drivers.find((d) => d.vehicleId === vehicle.id) ?? null;
   const linkedEquipments = equipments.filter((e) => e.vehicleId === vehicle.id);
 
   const facts = [
-    { icon: MapPin, label: "Agence", value: vehicle.agency },
-    { icon: User, label: "Conducteur", value: vehicle.driver ?? "Non affecté" },
+    { icon: MapPin, label: "Agence", value: agencyName(vehicle.agencyId) },
+    { icon: User, label: "Conducteur", value: linkedDriver ? `${linkedDriver.firstName} ${linkedDriver.lastName}` : "Non affecté" },
     { icon: Gauge, label: "Kilométrage", value: `${number(vehicle.km)} km` },
     { icon: Fuel, label: "Énergie", value: vehicle.energy },
     { icon: CalendarClock, label: "Fin de contrat", value: shortDate(vehicle.contractEnd) },
