@@ -25,7 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFleet, type Driver } from "@/lib/fleet-store";
 
-type FormState = Omit<Driver, "id" | "vehicleId">;
+type FormState = Omit<Driver, "id" | "vehicleId" | "archived">;
 
 const emptyForm = (agencyId: string): FormState => ({
   firstName: "",

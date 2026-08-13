@@ -51,13 +51,13 @@ export const Route = createFileRoute("/vehicules/")({
 });
 
 function VehiclesList() {
-  const { vehicles } = useFleet();
+  const { vehicles, agencyName, driverOfVehicle, driverName } = useFleet();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<VehicleStatus | "all">("all");
   const [agency, setAgency] = useState("all");
 
   const agencies = useMemo(
-    () => Array.from(new Set(vehicles.map((v) => v.agency))).sort(),
+    () => Array.from(new Set(vehicles.map((v) => agencyName(v.agencyId)))).sort(),
     [vehicles],
   );
 
@@ -66,12 +66,12 @@ function VehiclesList() {
     return vehicles.filter((vehicle) => {
       const matchesQuery =
         q.length === 0 ||
-        [vehicle.plate, vehicle.brand, vehicle.model, vehicle.id, vehicle.driver ?? ""]
+        [vehicle.plate, vehicle.brand, vehicle.model, vehicle.id, driverName(driverOfVehicle(vehicle.id)?.id ?? null)]
           .join(" ")
           .toLowerCase()
           .includes(q);
       const matchesStatus = status === "all" || vehicle.status === status;
-      const matchesAgency = agency === "all" || vehicle.agency === agency;
+      const matchesAgency = agency === "all" || agencyName(vehicle.agencyId) === agency;
       return matchesQuery && matchesStatus && matchesAgency;
     });
   }, [vehicles, query, status, agency]);
@@ -199,9 +199,9 @@ function VehiclesList() {
                         </Link>
                       </TableCell>
                       <TableCell className="tabular">{vehicle.plate}</TableCell>
-                      <TableCell>{vehicle.agency}</TableCell>
+                      <TableCell>{agencyName(vehicle.agencyId)}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {vehicle.driver ?? "Non affecté"}
+                        {driverName(driverOfVehicle(vehicle.id)?.id ?? null)}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={statusTone[vehicle.status]}>

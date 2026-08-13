@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { shortDate, statusLabels } from "@/lib/fleet-data";
-import { agencyIdByName, equipmentLabels, useFleet } from "@/lib/fleet-store";
+import { equipmentLabels, useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/affectations")({
   head: () => ({
@@ -39,13 +39,13 @@ export const Route = createFileRoute("/affectations")({
 });
 
 function AssignmentsPage() {
-  const { vehicles, drivers, agencies, equipments, history, applyAssignment, driverName } = useFleet();
+  const { vehicles, drivers, agencies, equipments, history, applyAssignment, driverName, agencyName } = useFleet();
 
   const [vehicleId, setVehicleId] = useState(vehicles[0]!.id);
   const vehicle = vehicles.find((v) => v.id === vehicleId)!;
 
   const [driverId, setDriverId] = useState<string>("none");
-  const [agencyId, setAgencyId] = useState<string>(agencyIdByName(vehicle.agency));
+  const [agencyId, setAgencyId] = useState<string>(vehicle.agencyId);
   const [equipmentIds, setEquipmentIds] = useState<string[]>([]);
 
   // Le formulaire reflète toujours l'état courant du véhicule sélectionné.
@@ -54,7 +54,7 @@ function AssignmentsPage() {
     if (!current) return;
     const linked = drivers.find((d) => d.vehicleId === vehicleId);
     setDriverId(linked?.id ?? "none");
-    setAgencyId(agencyIdByName(current.agency));
+    setAgencyId(current.agencyId);
     setEquipmentIds(equipments.filter((e) => e.vehicleId === vehicleId).map((e) => e.id));
   }, [vehicleId, vehicles, drivers, equipments]);
 
@@ -203,7 +203,7 @@ function AssignmentsPage() {
               <Row label="Véhicule" value={`${vehicle.brand} ${vehicle.model}`} />
               <Row label="Immatriculation" value={vehicle.plate} />
               <Row label="Statut" value={statusLabels[vehicle.status]} />
-              <Row label="Agence" value={vehicle.agency} />
+              <Row label="Agence" value={agencyName(vehicle.agencyId)} />
               <Row
                 label="Conducteur"
                 value={driverName(drivers.find((d) => d.vehicleId === vehicle.id)?.id ?? null)}
