@@ -354,11 +354,14 @@ export function FleetProvider({ children }: { children: ReactNode }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => seedVehicles.map((v) => ({ ...v })));
   const [drivers, setDrivers] = useState<Driver[]>(() => seedDrivers.map((d) => ({ ...d })));
   const [equipments, setEquipments] = useState<Equipment[]>(() => seedEquipments.map((e) => ({ ...e })));
-  const [rentals] = useState<Rental[]>(() => seedRentals.map((r) => ({ ...r })));
-  const [claims] = useState<Claim[]>(() => seedClaims.map((c) => ({ ...c })));
-  const [fines] = useState<Fine[]>(() => seedFines.map((f) => ({ ...f })));
-  const [insurancePolicies] = useState<InsurancePolicy[]>(() => seedPolicies.map((p) => ({ ...p })));
-  const [leases] = useState<Lease[]>(() => seedLeases.map((l) => ({ ...l })));
+  const [rentals, setRentals] = useState<Rental[]>(() => seedRentals.map((r) => ({ ...r })));
+  const [claims, setClaims] = useState<Claim[]>(() => seedClaims.map((c) => ({ ...c })));
+  const [fines, setFines] = useState<Fine[]>(() => seedFines.map((f) => ({ ...f })));
+  const [insurancePolicies, setPolicies] = useState<InsurancePolicy[]>(() =>
+    seedPolicies.map((p) => ({ ...p })),
+  );
+  const [leases, setLeases] = useState<Lease[]>(() => seedLeases.map((l) => ({ ...l })));
+
   const [expenses] = useState<Expense[]>(() => seedExpenses);
   const [history, setHistory] = useState<HistoryEntry[]>(() => [
     {
