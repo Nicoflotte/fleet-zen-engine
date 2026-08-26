@@ -327,6 +327,21 @@ type FleetContextValue = {
   applyAssignment: (input: AssignmentInput) => void;
   toggleVehicleArchive: (id: string) => void;
   toggleDriverArchive: (id: string) => void;
+  addEquipment: (input: Omit<Equipment, "id" | "archived">) => Equipment;
+  toggleEquipmentArchive: (id: string) => void;
+  addRental: (input: Omit<Rental, "id" | "archived">) => Rental;
+  toggleRentalArchive: (id: string) => void;
+  addClaim: (input: Omit<Claim, "id" | "archived">) => Claim;
+  updateClaim: (id: string, patch: Partial<Claim>) => void;
+  toggleClaimArchive: (id: string) => void;
+  addFine: (input: Omit<Fine, "id" | "archived">) => Fine;
+  updateFine: (id: string, patch: Partial<Fine>) => void;
+  toggleFineArchive: (id: string) => void;
+  addPolicy: (input: Omit<InsurancePolicy, "id" | "archived">) => InsurancePolicy;
+  togglePolicyArchive: (id: string) => void;
+  addLease: (input: Omit<Lease, "id" | "archived">) => Lease;
+  toggleLeaseArchive: (id: string) => void;
+
 };
 
 const FleetContext = createContext<FleetContextValue | null>(null);
