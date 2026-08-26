@@ -787,7 +787,22 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       applyAssignment,
       toggleVehicleArchive,
       toggleDriverArchive,
+      addEquipment,
+      toggleEquipmentArchive,
+      addRental,
+      toggleRentalArchive,
+      addClaim,
+      updateClaim,
+      toggleClaimArchive,
+      addFine,
+      updateFine,
+      toggleFineArchive,
+      addPolicy,
+      togglePolicyArchive,
+      addLease,
+      toggleLeaseArchive,
     ],
+
   );
 
   return <FleetContext.Provider value={value}>{children}</FleetContext.Provider>;
