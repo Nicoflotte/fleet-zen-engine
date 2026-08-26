@@ -585,6 +585,133 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [drivers, log],
   );
 
+  const newId = (prefix: string) => `${prefix}-${Math.floor(Math.random() * 9000 + 1000)}`;
+
+  const addEquipment = useCallback(
+    (input: Omit<Equipment, "id" | "archived">) => {
+      const item: Equipment = { ...input, id: newId("EQ"), archived: false };
+      setEquipments((prev) => [item, ...prev]);
+      log("Équipements", "Création", `${equipmentLabels[item.type]} ${item.reference} créé`);
+      return item;
+    },
+    [log],
+  );
+
+  const toggleEquipmentArchive = useCallback(
+    (id: string) => {
+      setEquipments((prev) => prev.map((e) => (e.id === id ? { ...e, archived: !e.archived } : e)));
+      log("Équipements", "Archivage", `Équipement ${id} basculé`);
+    },
+    [log],
+  );
+
+  const addRental = useCallback(
+    (input: Omit<Rental, "id" | "archived">) => {
+      const item: Rental = { ...input, id: newId("LOC"), archived: false };
+      setRentals((prev) => [item, ...prev]);
+      log("Locations", "Création", `Location ${item.plate} (${item.supplier}) créée`);
+      return item;
+    },
+    [log],
+  );
+
+  const toggleRentalArchive = useCallback(
+    (id: string) => {
+      setRentals((prev) => prev.map((r) => (r.id === id ? { ...r, archived: !r.archived } : r)));
+      log("Locations", "Archivage", `Location ${id} basculée`);
+    },
+    [log],
+  );
+
+  const addClaim = useCallback(
+    (input: Omit<Claim, "id" | "archived">) => {
+      const item: Claim = { ...input, id: newId("SIN"), archived: false };
+      setClaims((prev) => [item, ...prev]);
+      log("Sinistres", "Déclaration", `Sinistre ${item.plate} — ${item.nature}`);
+      return item;
+    },
+    [log],
+  );
+
+  const updateClaim = useCallback(
+    (id: string, patch: Partial<Claim>) => {
+      setClaims((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+      log("Sinistres", "Mise à jour", `Dossier ${id} modifié`);
+    },
+    [log],
+  );
+
+  const toggleClaimArchive = useCallback(
+    (id: string) => {
+      setClaims((prev) => prev.map((c) => (c.id === id ? { ...c, archived: !c.archived } : c)));
+      log("Sinistres", "Archivage", `Sinistre ${id} basculé`);
+    },
+    [log],
+  );
+
+  const addFine = useCallback(
+    (input: Omit<Fine, "id" | "archived">) => {
+      const item: Fine = { ...input, id: newId("CTR"), archived: false };
+      setFines((prev) => [item, ...prev]);
+      log("Contraventions", "Création", `Contravention ${item.plate} — ${item.nature}`);
+      return item;
+    },
+    [log],
+  );
+
+  const updateFine = useCallback(
+    (id: string, patch: Partial<Fine>) => {
+      setFines((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+      log("Contraventions", "Mise à jour", `Contravention ${id} — ${patch.status ?? "modifiée"}`);
+    },
+    [log],
+  );
+
+  const toggleFineArchive = useCallback(
+    (id: string) => {
+      setFines((prev) => prev.map((f) => (f.id === id ? { ...f, archived: !f.archived } : f)));
+      log("Contraventions", "Archivage", `Contravention ${id} basculée`);
+    },
+    [log],
+  );
+
+  const addPolicy = useCallback(
+    (input: Omit<InsurancePolicy, "id" | "archived">) => {
+      const item: InsurancePolicy = { ...input, id: newId("ASS"), archived: false };
+      setPolicies((prev) => [item, ...prev]);
+      log("Assurances", "Création", `Contrat ${item.insurer} ${item.policyNumber}`);
+      return item;
+    },
+    [log],
+  );
+
+  const togglePolicyArchive = useCallback(
+    (id: string) => {
+      setPolicies((prev) => prev.map((p) => (p.id === id ? { ...p, archived: !p.archived } : p)));
+      log("Assurances", "Archivage", `Contrat ${id} basculé`);
+    },
+    [log],
+  );
+
+  const addLease = useCallback(
+    (input: Omit<Lease, "id" | "archived">) => {
+      const item: Lease = { ...input, id: newId("CB"), archived: false };
+      setLeases((prev) => [item, ...prev]);
+      log("Crédits-baux", "Création", `${item.type === "loa" ? "LOA" : "Crédit-bail"} ${item.plate}`);
+      return item;
+    },
+    [log],
+  );
+
+  const toggleLeaseArchive = useCallback(
+    (id: string) => {
+      setLeases((prev) => prev.map((l) => (l.id === id ? { ...l, archived: !l.archived } : l)));
+      log("Crédits-baux", "Archivage", `Contrat ${id} basculé`);
+    },
+    [log],
+  );
+
+
   const value = useMemo<FleetContextValue>(
     () => ({
       entities,
