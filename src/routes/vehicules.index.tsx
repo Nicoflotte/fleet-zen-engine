@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, SlidersHorizontal, Plus, FileDown, CarFront } from "lucide-react";
+import { Search, SlidersHorizontal, FileDown, CarFront } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
+import { VehicleFormDialog } from "@/components/vehicle-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,9 +93,7 @@ function VehiclesList() {
             <Button variant="outline" size="sm">
               <FileDown /> Export Excel
             </Button>
-            <Button size="sm">
-              <Plus /> Ajouter un véhicule
-            </Button>
+            <VehicleFormDialog />
           </>
         }
       />
