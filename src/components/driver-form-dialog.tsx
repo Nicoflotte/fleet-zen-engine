@@ -46,8 +46,8 @@ const emptyForm = (agencyId: string): FormState => ({
   source: "manuel",
 });
 
-// Jeu de données simulant la lecture d'un permis de conduire (recto MRZ + zone adresse).
-const ocrExtraction = {
+// Jeu de démonstration, utilisé uniquement par le bouton « permis de démonstration ».
+const demoExtraction = {
   firstName: "Lucas",
   lastName: "Perrin",
   birthDate: "1993-04-08",
