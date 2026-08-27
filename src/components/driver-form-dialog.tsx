@@ -23,7 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fileToDataUrl } from "@/lib/export-csv";
 import { useFleet, type Driver } from "@/lib/fleet-store";
+import { scanDocument } from "@/lib/ocr.functions";
 
 type FormState = Omit<Driver, "id" | "vehicleId" | "archived">;
 
@@ -210,7 +212,7 @@ export function DriverFormDialog() {
                 className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
-                  if (file) runRecognition(file.name);
+                  if (file) void runRecognition(file);
                   event.target.value = "";
                 }}
               />
@@ -222,7 +224,7 @@ export function DriverFormDialog() {
                   variant="ghost"
                   size="sm"
                   disabled={scanning}
-                  onClick={() => runRecognition("permis-demo.jpg")}
+                  onClick={useDemo}
                 >
                   Utiliser un permis de démonstration
                 </Button>
