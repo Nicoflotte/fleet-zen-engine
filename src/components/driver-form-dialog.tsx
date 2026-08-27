@@ -78,16 +78,55 @@ export function DriverFormDialog() {
     setScanning(false);
   };
 
-  const runRecognition = (fileName: string) => {
+  const applyFields = (fields: Record<string, string>) => {
+    setForm((prev) => {
+      const next = { ...prev, source: "ocr_permis" as const };
+      (
+        [
+          "firstName",
+          "lastName",
+          "birthDate",
+          "licenseNumber",
+          "licenseCategories",
+          "licenseIssuedAt",
+          "licenseExpiry",
+          "street",
+          "postalCode",
+          "city",
+        ] as const
+      ).forEach((key) => {
+        const value = fields[key];
+        if (value && value.trim()) next[key] = value.trim();
+      });
+      return next;
+    });
+  };
+
+  const runRecognition = async (file: File) => {
     setScanning(true);
-    setTimeout(() => {
-      setForm((prev) => ({ ...prev, ...ocrExtraction, source: "ocr_permis" }));
-      setScanning(false);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const { fields } = await scanDocument({ data: { kind: "permis", dataUrl } });
+      applyFields(fields);
       setScanned(true);
       toast.success("Permis analysé", {
-        description: `${fileName} — 10 champs pré-remplis. Vérifiez puis validez.`,
+        description: `${file.name} — champs pré-remplis. Vérifiez puis validez.`,
       });
-    }, 1100);
+    } catch (error) {
+      toast.error("Analyse du permis impossible", {
+        description: error instanceof Error ? error.message : "Réessayez ou saisissez manuellement.",
+      });
+    } finally {
+      setScanning(false);
+    }
+  };
+
+  const useDemo = () => {
+    setForm((prev) => ({ ...prev, ...demoExtraction, source: "ocr_permis" }));
+    setScanned(true);
+    toast.success("Permis de démonstration chargé", {
+      description: "10 champs pré-remplis. Vérifiez puis validez.",
+    });
   };
 
   const submit = () => {
