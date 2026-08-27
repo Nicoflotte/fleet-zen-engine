@@ -23,7 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fileToDataUrl } from "@/lib/export-csv";
 import { useFleet, type Driver } from "@/lib/fleet-store";
+import { scanDocument } from "@/lib/ocr.functions";
 
 type FormState = Omit<Driver, "id" | "vehicleId" | "archived">;
 
@@ -46,8 +48,8 @@ const emptyForm = (agencyId: string): FormState => ({
   source: "manuel",
 });
 
-// Jeu de données simulant la lecture d'un permis de conduire (recto MRZ + zone adresse).
-const ocrExtraction = {
+// Jeu de démonstration, utilisé uniquement par le bouton « permis de démonstration ».
+const demoExtraction = {
   firstName: "Lucas",
   lastName: "Perrin",
   birthDate: "1993-04-08",
@@ -78,16 +80,55 @@ export function DriverFormDialog() {
     setScanning(false);
   };
 
-  const runRecognition = (fileName: string) => {
+  const applyFields = (fields: Record<string, string>) => {
+    setForm((prev) => {
+      const next = { ...prev, source: "ocr_permis" as const };
+      (
+        [
+          "firstName",
+          "lastName",
+          "birthDate",
+          "licenseNumber",
+          "licenseCategories",
+          "licenseIssuedAt",
+          "licenseExpiry",
+          "street",
+          "postalCode",
+          "city",
+        ] as const
+      ).forEach((key) => {
+        const value = fields[key];
+        if (value && value.trim()) next[key] = value.trim();
+      });
+      return next;
+    });
+  };
+
+  const runRecognition = async (file: File) => {
     setScanning(true);
-    setTimeout(() => {
-      setForm((prev) => ({ ...prev, ...ocrExtraction, source: "ocr_permis" }));
-      setScanning(false);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const { fields } = await scanDocument({ data: { kind: "permis", dataUrl } });
+      applyFields(fields);
       setScanned(true);
       toast.success("Permis analysé", {
-        description: `${fileName} — 10 champs pré-remplis. Vérifiez puis validez.`,
+        description: `${file.name} — champs pré-remplis. Vérifiez puis validez.`,
       });
-    }, 1100);
+    } catch (error) {
+      toast.error("Analyse du permis impossible", {
+        description: error instanceof Error ? error.message : "Réessayez ou saisissez manuellement.",
+      });
+    } finally {
+      setScanning(false);
+    }
+  };
+
+  const useDemo = () => {
+    setForm((prev) => ({ ...prev, ...demoExtraction, source: "ocr_permis" }));
+    setScanned(true);
+    toast.success("Permis de démonstration chargé", {
+      description: "10 champs pré-remplis. Vérifiez puis validez.",
+    });
   };
 
   const submit = () => {
@@ -171,7 +212,7 @@ export function DriverFormDialog() {
                 className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
-                  if (file) runRecognition(file.name);
+                  if (file) void runRecognition(file);
                   event.target.value = "";
                 }}
               />
@@ -183,7 +224,7 @@ export function DriverFormDialog() {
                   variant="ghost"
                   size="sm"
                   disabled={scanning}
-                  onClick={() => runRecognition("permis-demo.jpg")}
+                  onClick={useDemo}
                 >
                   Utiliser un permis de démonstration
                 </Button>
