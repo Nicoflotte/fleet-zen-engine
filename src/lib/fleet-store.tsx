@@ -762,6 +762,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       updateFine,
       toggleFineArchive,
       addPolicy,
+      updatePolicy,
       togglePolicyArchive,
       addLease,
       toggleLeaseArchive,
