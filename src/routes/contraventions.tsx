@@ -120,7 +120,7 @@ function FinesPage() {
                   label: "Conducteur désigné (facultatif)",
                   type: "select",
                   options: [
-                    { value: "", label: "À désigner" },
+                    { value: "__none__", label: "À désigner" },
                     ...activeDrivers.map((d) => ({
                       value: `${d.firstName} ${d.lastName}`,
                       label: `${d.firstName} ${d.lastName}`,
@@ -137,7 +137,8 @@ function FinesPage() {
                 },
               ]}
               onSubmit={(values) => {
-                const driverName = values["driverName"]?.trim() ? values["driverName"]! : null;
+                const raw = values["driverName"]?.trim() ?? "";
+                const driverName = raw && raw !== "__none__" ? raw : null;
                 const fine = addFine({
                   antaiReference: values["antaiReference"]!,
                   date: values["date"]!,
