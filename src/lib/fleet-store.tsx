@@ -686,6 +686,14 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [log],
   );
 
+  const updatePolicy = useCallback(
+    (id: string, patch: Partial<InsurancePolicy>) => {
+      setPolicies((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+      log("Assurances", "Mise à jour", `Contrat ${id} modifié`);
+    },
+    [log],
+  );
+
   const togglePolicyArchive = useCallback(
     (id: string) => {
       setPolicies((prev) => prev.map((p) => (p.id === id ? { ...p, archived: !p.archived } : p)));
