@@ -505,6 +505,15 @@ export const fines: Fine[] = [
 
 // --- Assurances ------------------------------------------------------------
 
+export type PolicyStatus = "active" | "a_renouveler" | "resilie" | "echeance";
+
+export const policyStatusLabels: Record<PolicyStatus, string> = {
+  active: "Active",
+  a_renouveler: "À renouveler",
+  resilie: "Résiliée",
+  echeance: "Échéance",
+};
+
 export type InsurancePolicy = {
   id: string;
   insurer: string;
@@ -514,15 +523,16 @@ export type InsurancePolicy = {
   vehicles: number;
   annualPremium: number;
   renewal: string;
+  status: PolicyStatus;
   archived: boolean;
 };
 
 export const insurancePolicies: InsurancePolicy[] = [
-  { id: "ASS-01", insurer: "AXA Flotte", policyNumber: "AX-4471-882", entityId: "OF", scope: "Flotte VP + VU", vehicles: 64, annualPremium: 78400, renewal: "2026-12-31", archived: false },
-  { id: "ASS-02", insurer: "Allianz", policyNumber: "AL-2210-117", entityId: "SEE", scope: "Flotte VU", vehicles: 38, annualPremium: 51200, renewal: "2027-03-31", archived: false },
-  { id: "ASS-03", insurer: "AXA Flotte", policyNumber: "AX-4471-902", entityId: "SATE", scope: "Flotte VP + 2 roues", vehicles: 22, annualPremium: 24800, renewal: "2026-10-31", archived: false },
-  { id: "ASS-04", insurer: "Generali", policyNumber: "GE-8890-441", entityId: "MET", scope: "Flotte VP", vehicles: 12, annualPremium: 16900, renewal: "2027-01-31", archived: false },
-  { id: "ASS-05", insurer: "Allianz", policyNumber: "AL-2210-330", entityId: "TCE", scope: "Flotte VU", vehicles: 17, annualPremium: 22600, renewal: "2026-11-30", archived: false },
+  { id: "ASS-01", insurer: "AXA Flotte", policyNumber: "AX-4471-882", entityId: "OF", scope: "Flotte VP + VU", vehicles: 64, annualPremium: 78400, renewal: "2026-12-31", status: "active", archived: false },
+  { id: "ASS-02", insurer: "Allianz", policyNumber: "AL-2210-117", entityId: "SEE", scope: "Flotte VU", vehicles: 38, annualPremium: 51200, renewal: "2027-03-31", status: "active", archived: false },
+  { id: "ASS-03", insurer: "AXA Flotte", policyNumber: "AX-4471-902", entityId: "SATE", scope: "Flotte VP + 2 roues", vehicles: 22, annualPremium: 24800, renewal: "2026-10-31", status: "a_renouveler", archived: false },
+  { id: "ASS-04", insurer: "Generali", policyNumber: "GE-8890-441", entityId: "MET", scope: "Flotte VP", vehicles: 12, annualPremium: 16900, renewal: "2027-01-31", status: "active", archived: false },
+  { id: "ASS-05", insurer: "Allianz", policyNumber: "AL-2210-330", entityId: "TCE", scope: "Flotte VU", vehicles: 17, annualPremium: 22600, renewal: "2026-11-30", status: "echeance", archived: false },
 ];
 
 // --- Crédits-baux / LOA ----------------------------------------------------
