@@ -713,6 +713,14 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [log],
   );
 
+  const updateLease = useCallback(
+    (id: string, patch: Partial<Lease>) => {
+      setLeases((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+      log("Crédits-baux", "Mise à jour", `Contrat ${id} modifié`);
+    },
+    [log],
+  );
+
   const toggleLeaseArchive = useCallback(
     (id: string) => {
       setLeases((prev) => prev.map((l) => (l.id === id ? { ...l, archived: !l.archived } : l)));
