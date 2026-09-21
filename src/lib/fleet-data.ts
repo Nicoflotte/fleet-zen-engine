@@ -537,6 +537,15 @@ export const insurancePolicies: InsurancePolicy[] = [
 
 // --- Crédits-baux / LOA ----------------------------------------------------
 
+export type LeaseStatus = "en_cours" | "a_terme" | "solde" | "resilie";
+
+export const leaseStatusLabels: Record<LeaseStatus, string> = {
+  en_cours: "En cours",
+  a_terme: "Arrive à terme",
+  solde: "Soldé",
+  resilie: "Résilié",
+};
+
 export type Lease = {
   id: string;
   plate: string;
@@ -549,16 +558,17 @@ export type Lease = {
   end: string;
   remainingMonths: number;
   residualValue: number;
+  status: LeaseStatus;
   archived: boolean;
 };
 
 export const leases: Lease[] = [
-  { id: "CB-901", plate: "FT-208-QW", vehicleLabel: "Peugeot 308 SW", lender: "BNP Leasing", type: "credit_bail", entityId: "OF", monthlyRent: 548, start: "2021-09-15", end: "2026-09-15", remainingMonths: 1, residualValue: 4200, archived: false },
-  { id: "CB-902", plate: "FL-330-PB", vehicleLabel: "Peugeot Partner", lender: "BNP Leasing", type: "credit_bail", entityId: "OF", monthlyRent: 389, start: "2020-11-01", end: "2026-10-31", remainingMonths: 2, residualValue: 2600, archived: false },
-  { id: "CB-903", plate: "GF-472-KD", vehicleLabel: "Renault Kangoo E-Tech", lender: "Mobilize FS", type: "loa", entityId: "OF", monthlyRent: 612, start: "2023-04-01", end: "2027-04-30", remainingMonths: 9, residualValue: 8100, archived: false },
-  { id: "CB-904", plate: "GA-115-ZR", vehicleLabel: "Toyota Corolla TS", lender: "Toyota Financial", type: "loa", entityId: "SATE", monthlyRent: 501, start: "2022-08-19", end: "2026-08-31", remainingMonths: 0, residualValue: 6400, archived: false },
-  { id: "CB-905", plate: "GH-604-LM", vehicleLabel: "Volkswagen ID.4", lender: "VW Financial", type: "loa", entityId: "MET", monthlyRent: 735, start: "2024-02-11", end: "2028-02-10", remainingMonths: 18, residualValue: 12900, archived: false },
-  { id: "CB-906", plate: "GC-201-JF", vehicleLabel: "Ford Ranger", lender: "Ford Credit", type: "loa", entityId: "TCE", monthlyRent: 690, start: "2024-06-01", end: "2027-11-30", remainingMonths: 15, residualValue: 10400, archived: false },
+  { id: "CB-901", plate: "FT-208-QW", vehicleLabel: "Peugeot 308 SW", lender: "BNP Leasing", type: "credit_bail", entityId: "OF", monthlyRent: 548, start: "2021-09-15", end: "2026-09-15", remainingMonths: 1, residualValue: 4200, status: "a_terme", archived: false },
+  { id: "CB-902", plate: "FL-330-PB", vehicleLabel: "Peugeot Partner", lender: "BNP Leasing", type: "credit_bail", entityId: "OF", monthlyRent: 389, start: "2020-11-01", end: "2026-10-31", remainingMonths: 2, residualValue: 2600, status: "a_terme", archived: false },
+  { id: "CB-903", plate: "GF-472-KD", vehicleLabel: "Renault Kangoo E-Tech", lender: "Mobilize FS", type: "loa", entityId: "OF", monthlyRent: 612, start: "2023-04-01", end: "2027-04-30", remainingMonths: 9, residualValue: 8100, status: "en_cours", archived: false },
+  { id: "CB-904", plate: "GA-115-ZR", vehicleLabel: "Toyota Corolla TS", lender: "Toyota Financial", type: "loa", entityId: "SATE", monthlyRent: 501, start: "2022-08-19", end: "2026-08-31", remainingMonths: 0, residualValue: 6400, status: "solde", archived: false },
+  { id: "CB-905", plate: "GH-604-LM", vehicleLabel: "Volkswagen ID.4", lender: "VW Financial", type: "loa", entityId: "MET", monthlyRent: 735, start: "2024-02-11", end: "2028-02-10", remainingMonths: 18, residualValue: 12900, status: "en_cours", archived: false },
+  { id: "CB-906", plate: "GC-201-JF", vehicleLabel: "Ford Ranger", lender: "Ford Credit", type: "loa", entityId: "TCE", monthlyRent: 690, start: "2024-06-01", end: "2027-11-30", remainingMonths: 15, residualValue: 10400, status: "en_cours", archived: false },
 ];
 
 // --- Dépenses par types ----------------------------------------------------

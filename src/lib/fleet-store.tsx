@@ -341,6 +341,7 @@ type FleetContextValue = {
   updatePolicy: (id: string, patch: Partial<InsurancePolicy>) => void;
   togglePolicyArchive: (id: string) => void;
   addLease: (input: Omit<Lease, "id" | "archived">) => Lease;
+  updateLease: (id: string, patch: Partial<Lease>) => void;
   toggleLeaseArchive: (id: string) => void;
 
 };
@@ -712,6 +713,14 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [log],
   );
 
+  const updateLease = useCallback(
+    (id: string, patch: Partial<Lease>) => {
+      setLeases((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+      log("Crédits-baux", "Mise à jour", `Contrat ${id} modifié`);
+    },
+    [log],
+  );
+
   const toggleLeaseArchive = useCallback(
     (id: string) => {
       setLeases((prev) => prev.map((l) => (l.id === id ? { ...l, archived: !l.archived } : l)));
@@ -765,6 +774,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       updatePolicy,
       togglePolicyArchive,
       addLease,
+      updateLease,
       toggleLeaseArchive,
     }),
 
@@ -811,6 +821,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       updatePolicy,
       togglePolicyArchive,
       addLease,
+      updateLease,
       toggleLeaseArchive,
     ],
 
