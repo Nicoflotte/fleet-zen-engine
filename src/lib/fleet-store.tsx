@@ -341,6 +341,7 @@ type FleetContextValue = {
   updatePolicy: (id: string, patch: Partial<InsurancePolicy>) => void;
   togglePolicyArchive: (id: string) => void;
   addLease: (input: Omit<Lease, "id" | "archived">) => Lease;
+  updateLease: (id: string, patch: Partial<Lease>) => void;
   toggleLeaseArchive: (id: string) => void;
 
 };
