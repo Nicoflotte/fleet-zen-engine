@@ -68,11 +68,125 @@ export const Route = createFileRoute("/credits-baux")({
   component: LeasesPage,
 });
 
+type SortKey = "vehicleLabel" | "entity" | "monthlyRent" | "end" | "remainingMonths";
+type SortDir = "asc" | "desc";
+type Prefs = {
+  query: string;
+  entity: string;
+  status: LeaseStatus | "all";
+  due: "all" | "90" | "180" | "365" | "past";
+  sortKey: SortKey;
+  sortDir: SortDir;
+};
+
+const STORAGE_KEY = "fleet.leases.filters";
+const defaultPrefs: Prefs = {
+  query: "",
+  entity: "all",
+  status: "all",
+  due: "all",
+  sortKey: "end",
+  sortDir: "asc",
+};
+
+const dueLabels: Record<Prefs["due"], string> = {
+  all: "Toutes les échéances",
+  "90": "Dans les 3 mois",
+  "180": "Dans les 6 mois",
+  "365": "Dans les 12 mois",
+  past: "Échéance dépassée",
+};
+
 function LeasesPage() {
   const { leases, entities, entityName, addLease, updateLease, toggleLeaseArchive } = useFleet();
   const [showArchived, setShowArchived] = useState(false);
+  const [prefs, setPrefs] = useState<Prefs>(defaultPrefs);
+  const [loaded, setLoaded] = useState(false);
 
-  const rows = leases.filter((l) => (showArchived ? l.archived : !l.archived));
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setPrefs({ ...defaultPrefs, ...(JSON.parse(raw) as Partial<Prefs>) });
+    } catch {
+      /* préférences illisibles : on garde les valeurs par défaut */
+    }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    } catch {
+      /* stockage indisponible */
+    }
+  }, [prefs, loaded]);
+
+  const update = (patch: Partial<Prefs>) => setPrefs((p) => ({ ...p, ...patch }));
+  const toggleSort = (key: SortKey) =>
+    setPrefs((p) => ({
+      ...p,
+      sortKey: key,
+      sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
+    }));
+
+  const rows = useMemo(() => {
+    const q = prefs.query.trim().toLowerCase();
+    const now = Date.now();
+    const filtered = leases.filter((l) => {
+      if (showArchived ? !l.archived : l.archived) return false;
+      if (
+        q &&
+        ![l.vehicleLabel, l.plate, l.lender, l.id].join(" ").toLowerCase().includes(q)
+      )
+        return false;
+      if (prefs.entity !== "all" && l.entityId !== prefs.entity) return false;
+      if (prefs.status !== "all" && l.status !== prefs.status) return false;
+      if (prefs.due !== "all") {
+        const diff = new Date(l.end).getTime() - now;
+        if (prefs.due === "past") {
+          if (diff >= 0) return false;
+        } else {
+          const max = Number(prefs.due) * 86_400_000;
+          if (diff < 0 || diff > max) return false;
+        }
+      }
+      return true;
+    });
+
+    const dir = prefs.sortDir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      switch (prefs.sortKey) {
+        case "monthlyRent":
+          return (a.monthlyRent - b.monthlyRent) * dir;
+        case "remainingMonths":
+          return (a.remainingMonths - b.remainingMonths) * dir;
+        case "end":
+          return (new Date(a.end).getTime() - new Date(b.end).getTime()) * dir;
+        case "entity":
+          return entityName(a.entityId).localeCompare(entityName(b.entityId), "fr") * dir;
+        default:
+          return a.vehicleLabel.localeCompare(b.vehicleLabel, "fr") * dir;
+      }
+    });
+  }, [leases, showArchived, prefs, entityName]);
+
+  const SortButton = ({ label, sortKey }: { label: string; sortKey: SortKey }) => (
+    <button
+      type="button"
+      onClick={() => toggleSort(sortKey)}
+      className="inline-flex items-center gap-1 hover:text-accent"
+    >
+      {label}
+      {prefs.sortKey === sortKey &&
+        (prefs.sortDir === "asc" ? (
+          <ArrowUp className="size-3.5" />
+        ) : (
+          <ArrowDown className="size-3.5" />
+        ))}
+    </button>
+  );
+
   const active = leases.filter((l) => !l.archived);
   const monthly = active.reduce((sum, l) => sum + l.monthlyRent, 0);
   const endingSoon = active.filter((l) => l.status === "a_terme").length;
