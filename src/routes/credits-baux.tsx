@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Archive, ArchiveRestore, Download } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  ArrowDown,
+  ArrowUp,
+  Download,
+  Search,
+  SlidersHorizontal,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
 import { RecordFormDialog } from "@/components/record-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -59,11 +68,125 @@ export const Route = createFileRoute("/credits-baux")({
   component: LeasesPage,
 });
 
+type SortKey = "vehicleLabel" | "entity" | "monthlyRent" | "end" | "remainingMonths";
+type SortDir = "asc" | "desc";
+type Prefs = {
+  query: string;
+  entity: string;
+  status: LeaseStatus | "all";
+  due: "all" | "90" | "180" | "365" | "past";
+  sortKey: SortKey;
+  sortDir: SortDir;
+};
+
+const STORAGE_KEY = "fleet.leases.filters";
+const defaultPrefs: Prefs = {
+  query: "",
+  entity: "all",
+  status: "all",
+  due: "all",
+  sortKey: "end",
+  sortDir: "asc",
+};
+
+const dueLabels: Record<Prefs["due"], string> = {
+  all: "Toutes les échéances",
+  "90": "Dans les 3 mois",
+  "180": "Dans les 6 mois",
+  "365": "Dans les 12 mois",
+  past: "Échéance dépassée",
+};
+
 function LeasesPage() {
   const { leases, entities, entityName, addLease, updateLease, toggleLeaseArchive } = useFleet();
   const [showArchived, setShowArchived] = useState(false);
+  const [prefs, setPrefs] = useState<Prefs>(defaultPrefs);
+  const [loaded, setLoaded] = useState(false);
 
-  const rows = leases.filter((l) => (showArchived ? l.archived : !l.archived));
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setPrefs({ ...defaultPrefs, ...(JSON.parse(raw) as Partial<Prefs>) });
+    } catch {
+      /* préférences illisibles : on garde les valeurs par défaut */
+    }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    } catch {
+      /* stockage indisponible */
+    }
+  }, [prefs, loaded]);
+
+  const update = (patch: Partial<Prefs>) => setPrefs((p) => ({ ...p, ...patch }));
+  const toggleSort = (key: SortKey) =>
+    setPrefs((p) => ({
+      ...p,
+      sortKey: key,
+      sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
+    }));
+
+  const rows = useMemo(() => {
+    const q = prefs.query.trim().toLowerCase();
+    const now = Date.now();
+    const filtered = leases.filter((l) => {
+      if (showArchived ? !l.archived : l.archived) return false;
+      if (
+        q &&
+        ![l.vehicleLabel, l.plate, l.lender, l.id].join(" ").toLowerCase().includes(q)
+      )
+        return false;
+      if (prefs.entity !== "all" && l.entityId !== prefs.entity) return false;
+      if (prefs.status !== "all" && l.status !== prefs.status) return false;
+      if (prefs.due !== "all") {
+        const diff = new Date(l.end).getTime() - now;
+        if (prefs.due === "past") {
+          if (diff >= 0) return false;
+        } else {
+          const max = Number(prefs.due) * 86_400_000;
+          if (diff < 0 || diff > max) return false;
+        }
+      }
+      return true;
+    });
+
+    const dir = prefs.sortDir === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      switch (prefs.sortKey) {
+        case "monthlyRent":
+          return (a.monthlyRent - b.monthlyRent) * dir;
+        case "remainingMonths":
+          return (a.remainingMonths - b.remainingMonths) * dir;
+        case "end":
+          return (new Date(a.end).getTime() - new Date(b.end).getTime()) * dir;
+        case "entity":
+          return entityName(a.entityId).localeCompare(entityName(b.entityId), "fr") * dir;
+        default:
+          return a.vehicleLabel.localeCompare(b.vehicleLabel, "fr") * dir;
+      }
+    });
+  }, [leases, showArchived, prefs, entityName]);
+
+  const SortButton = ({ label, sortKey }: { label: string; sortKey: SortKey }) => (
+    <button
+      type="button"
+      onClick={() => toggleSort(sortKey)}
+      className="inline-flex items-center gap-1 hover:text-accent"
+    >
+      {label}
+      {prefs.sortKey === sortKey &&
+        (prefs.sortDir === "asc" ? (
+          <ArrowUp className="size-3.5" />
+        ) : (
+          <ArrowDown className="size-3.5" />
+        ))}
+    </button>
+  );
+
   const active = leases.filter((l) => !l.archived);
   const monthly = active.reduce((sum, l) => sum + l.monthlyRent, 0);
   const endingSoon = active.filter((l) => l.status === "a_terme").length;
@@ -193,21 +316,103 @@ function LeasesPage() {
           </>
         }
       />
-      <main className="flex-1 px-4 py-6 md:px-8">
+      <main className="flex-1 space-y-5 px-4 py-6 md:px-8">
+        <section className="panel flex flex-wrap items-center gap-3 p-4">
+          <div className="relative min-w-56 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={prefs.query}
+              onChange={(event) => update({ query: event.target.value })}
+              placeholder="Véhicule, immatriculation, organisme…"
+              className="pl-9"
+              aria-label="Rechercher un contrat"
+            />
+          </div>
+
+          <Select value={prefs.entity} onValueChange={(value) => update({ entity: value })}>
+            <SelectTrigger className="w-48" aria-label="Filtrer par société">
+              <SelectValue placeholder="Société" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les sociétés</SelectItem>
+              {entities.map((e) => (
+                <SelectItem key={e.id} value={e.id}>
+                  {e.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={prefs.status}
+            onValueChange={(value) => update({ status: value as LeaseStatus | "all" })}
+          >
+            <SelectTrigger className="w-44" aria-label="Filtrer par statut">
+              <SelectValue placeholder="Statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              {Object.entries(leaseStatusLabels).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={prefs.due}
+            onValueChange={(value) => update({ due: value as Prefs["due"] })}
+          >
+            <SelectTrigger className="w-48" aria-label="Filtrer par échéance">
+              <SelectValue placeholder="Échéance" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(dueLabels).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="ghost" size="sm" onClick={() => setPrefs(defaultPrefs)}>
+            <SlidersHorizontal /> Réinitialiser
+          </Button>
+        </section>
+
         <section className="panel overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+            <p className="text-sm font-semibold">
+              {rows.length} contrat{rows.length > 1 ? "s" : ""}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Filtres et tri conservés pour vos prochaines visites
+            </p>
+          </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Contrat</TableHead>
-                  <TableHead>Véhicule</TableHead>
+                  <TableHead>
+                    <SortButton label="Véhicule" sortKey="vehicleLabel" />
+                  </TableHead>
                   <TableHead>Immat.</TableHead>
                   <TableHead>Organisme</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Société</TableHead>
-                  <TableHead className="text-right">Loyer</TableHead>
-                  <TableHead>Fin</TableHead>
-                  <TableHead className="text-right">Restant</TableHead>
+                  <TableHead>
+                    <SortButton label="Société" sortKey="entity" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <SortButton label="Loyer" sortKey="monthlyRent" />
+                  </TableHead>
+                  <TableHead>
+                    <SortButton label="Fin" sortKey="end" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <SortButton label="Restant" sortKey="remainingMonths" />
+                  </TableHead>
                   <TableHead className="text-right">Valeur résiduelle</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Action</TableHead>
