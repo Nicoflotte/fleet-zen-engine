@@ -316,21 +316,103 @@ function LeasesPage() {
           </>
         }
       />
-      <main className="flex-1 px-4 py-6 md:px-8">
+      <main className="flex-1 space-y-5 px-4 py-6 md:px-8">
+        <section className="panel flex flex-wrap items-center gap-3 p-4">
+          <div className="relative min-w-56 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={prefs.query}
+              onChange={(event) => update({ query: event.target.value })}
+              placeholder="Véhicule, immatriculation, organisme…"
+              className="pl-9"
+              aria-label="Rechercher un contrat"
+            />
+          </div>
+
+          <Select value={prefs.entity} onValueChange={(value) => update({ entity: value })}>
+            <SelectTrigger className="w-48" aria-label="Filtrer par société">
+              <SelectValue placeholder="Société" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les sociétés</SelectItem>
+              {entities.map((e) => (
+                <SelectItem key={e.id} value={e.id}>
+                  {e.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={prefs.status}
+            onValueChange={(value) => update({ status: value as LeaseStatus | "all" })}
+          >
+            <SelectTrigger className="w-44" aria-label="Filtrer par statut">
+              <SelectValue placeholder="Statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              {Object.entries(leaseStatusLabels).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={prefs.due}
+            onValueChange={(value) => update({ due: value as Prefs["due"] })}
+          >
+            <SelectTrigger className="w-48" aria-label="Filtrer par échéance">
+              <SelectValue placeholder="Échéance" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(dueLabels).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="ghost" size="sm" onClick={() => setPrefs(defaultPrefs)}>
+            <SlidersHorizontal /> Réinitialiser
+          </Button>
+        </section>
+
         <section className="panel overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+            <p className="text-sm font-semibold">
+              {rows.length} contrat{rows.length > 1 ? "s" : ""}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Filtres et tri conservés pour vos prochaines visites
+            </p>
+          </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Contrat</TableHead>
-                  <TableHead>Véhicule</TableHead>
+                  <TableHead>
+                    <SortButton label="Véhicule" sortKey="vehicleLabel" />
+                  </TableHead>
                   <TableHead>Immat.</TableHead>
                   <TableHead>Organisme</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Société</TableHead>
-                  <TableHead className="text-right">Loyer</TableHead>
-                  <TableHead>Fin</TableHead>
-                  <TableHead className="text-right">Restant</TableHead>
+                  <TableHead>
+                    <SortButton label="Société" sortKey="entity" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <SortButton label="Loyer" sortKey="monthlyRent" />
+                  </TableHead>
+                  <TableHead>
+                    <SortButton label="Fin" sortKey="end" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    <SortButton label="Restant" sortKey="remainingMonths" />
+                  </TableHead>
                   <TableHead className="text-right">Valeur résiduelle</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Action</TableHead>
