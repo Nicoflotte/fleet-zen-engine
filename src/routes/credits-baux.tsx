@@ -73,6 +73,7 @@ type SortDir = "asc" | "desc";
 type Prefs = {
   query: string;
   entity: string;
+  vehicle: string;
   status: LeaseStatus | "all";
   due: "all" | "90" | "180" | "365" | "past";
   sortKey: SortKey;
@@ -83,6 +84,7 @@ const STORAGE_KEY = "fleet.leases.filters";
 const defaultPrefs: Prefs = {
   query: "",
   entity: "all",
+  vehicle: "all",
   status: "all",
   due: "all",
   sortKey: "end",
