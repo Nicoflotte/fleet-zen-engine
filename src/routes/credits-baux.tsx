@@ -132,6 +132,16 @@ function LeasesPage() {
       sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
     }));
 
+  const vehicleOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of leases) {
+      if (!map.has(l.plate)) map.set(l.plate, l.vehicleLabel);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[1].localeCompare(b[1], "fr"))
+      .map(([plate, label]) => ({ plate, label }));
+  }, [leases]);
+
   const rows = useMemo(() => {
     const q = prefs.query.trim().toLowerCase();
     const now = Date.now();
