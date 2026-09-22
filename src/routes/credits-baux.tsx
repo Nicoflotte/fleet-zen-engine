@@ -143,6 +143,7 @@ function LeasesPage() {
       )
         return false;
       if (prefs.entity !== "all" && l.entityId !== prefs.entity) return false;
+      if (prefs.vehicle !== "all" && l.plate !== prefs.vehicle) return false;
       if (prefs.status !== "all" && l.status !== prefs.status) return false;
       if (prefs.due !== "all") {
         const diff = new Date(l.end).getTime() - now;
