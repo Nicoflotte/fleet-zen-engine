@@ -357,6 +357,23 @@ function LeasesPage() {
           </Select>
 
           <Select
+            value={prefs.vehicle}
+            onValueChange={(value) => update({ vehicle: value })}
+          >
+            <SelectTrigger className="w-56" aria-label="Filtrer par véhicule">
+              <SelectValue placeholder="Véhicule" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les véhicules</SelectItem>
+              {vehicleOptions.map((v) => (
+                <SelectItem key={v.plate} value={v.plate}>
+                  {v.label} — {v.plate}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
             value={prefs.status}
             onValueChange={(value) => update({ status: value as LeaseStatus | "all" })}
           >
