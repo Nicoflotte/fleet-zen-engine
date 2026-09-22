@@ -73,6 +73,7 @@ type SortDir = "asc" | "desc";
 type Prefs = {
   query: string;
   entity: string;
+  vehicle: string;
   status: LeaseStatus | "all";
   due: "all" | "90" | "180" | "365" | "past";
   sortKey: SortKey;
@@ -83,6 +84,7 @@ const STORAGE_KEY = "fleet.leases.filters";
 const defaultPrefs: Prefs = {
   query: "",
   entity: "all",
+  vehicle: "all",
   status: "all",
   due: "all",
   sortKey: "end",
@@ -130,6 +132,16 @@ function LeasesPage() {
       sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
     }));
 
+  const vehicleOptions = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of leases) {
+      if (!map.has(l.plate)) map.set(l.plate, l.vehicleLabel);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[1].localeCompare(b[1], "fr"))
+      .map(([plate, label]) => ({ plate, label }));
+  }, [leases]);
+
   const rows = useMemo(() => {
     const q = prefs.query.trim().toLowerCase();
     const now = Date.now();
@@ -141,6 +153,7 @@ function LeasesPage() {
       )
         return false;
       if (prefs.entity !== "all" && l.entityId !== prefs.entity) return false;
+      if (prefs.vehicle !== "all" && l.plate !== prefs.vehicle) return false;
       if (prefs.status !== "all" && l.status !== prefs.status) return false;
       if (prefs.due !== "all") {
         const diff = new Date(l.end).getTime() - now;
@@ -338,6 +351,23 @@ function LeasesPage() {
               {entities.map((e) => (
                 <SelectItem key={e.id} value={e.id}>
                   {e.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={prefs.vehicle}
+            onValueChange={(value) => update({ vehicle: value })}
+          >
+            <SelectTrigger className="w-56" aria-label="Filtrer par véhicule">
+              <SelectValue placeholder="Véhicule" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les véhicules</SelectItem>
+              {vehicleOptions.map((v) => (
+                <SelectItem key={v.plate} value={v.plate}>
+                  {v.label} — {v.plate}
                 </SelectItem>
               ))}
             </SelectContent>
