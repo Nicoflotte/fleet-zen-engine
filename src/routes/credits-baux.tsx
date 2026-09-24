@@ -6,6 +6,7 @@ import {
   ArrowDown,
   ArrowUp,
   Download,
+  RotateCcw,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
@@ -131,6 +132,19 @@ function LeasesPage() {
       sortKey: key,
       sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
     }));
+
+  const activePrefsCount = useMemo(() => {
+    let n = 0;
+    if (prefs.query.trim()) n++;
+    if (prefs.entity !== "all") n++;
+    if (prefs.vehicle !== "all") n++;
+    if (prefs.status !== "all") n++;
+    if (prefs.due !== "all") n++;
+    if (prefs.sortKey !== defaultPrefs.sortKey || prefs.sortDir !== defaultPrefs.sortDir)
+      n++;
+    return n;
+  }, [prefs]);
+  const hasActivePrefs = activePrefsCount > 0;
 
   const vehicleOptions = useMemo(() => {
     const map = new Map<string, string>();
@@ -406,8 +420,21 @@ function LeasesPage() {
             </SelectContent>
           </Select>
 
-          <Button variant="ghost" size="sm" onClick={() => setPrefs(defaultPrefs)}>
-            <SlidersHorizontal /> Réinitialiser
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!hasActivePrefs}
+            onClick={() => {
+              setPrefs(defaultPrefs);
+              toast.success("Recherche, filtres et tri réinitialisés");
+            }}
+          >
+            <RotateCcw /> Réinitialiser
+            {hasActivePrefs && (
+              <Badge variant="secondary" className="ml-1 tabular">
+                {activePrefsCount}
+              </Badge>
+            )}
           </Button>
         </section>
 
