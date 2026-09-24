@@ -133,6 +133,19 @@ function LeasesPage() {
       sortDir: p.sortKey === key && p.sortDir === "asc" ? "desc" : "asc",
     }));
 
+  const activePrefsCount = useMemo(() => {
+    let n = 0;
+    if (prefs.query.trim()) n++;
+    if (prefs.entity !== "all") n++;
+    if (prefs.vehicle !== "all") n++;
+    if (prefs.status !== "all") n++;
+    if (prefs.due !== "all") n++;
+    if (prefs.sortKey !== defaultPrefs.sortKey || prefs.sortDir !== defaultPrefs.sortDir)
+      n++;
+    return n;
+  }, [prefs]);
+  const hasActivePrefs = activePrefsCount > 0;
+
   const vehicleOptions = useMemo(() => {
     const map = new Map<string, string>();
     for (const l of leases) {
