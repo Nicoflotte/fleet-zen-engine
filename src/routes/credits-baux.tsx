@@ -407,8 +407,21 @@ function LeasesPage() {
             </SelectContent>
           </Select>
 
-          <Button variant="ghost" size="sm" onClick={() => setPrefs(defaultPrefs)}>
-            <SlidersHorizontal /> Réinitialiser
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={!hasActivePrefs}
+            onClick={() => {
+              setPrefs(defaultPrefs);
+              toast.success("Recherche, filtres et tri réinitialisés");
+            }}
+          >
+            <RotateCcw /> Réinitialiser
+            {hasActivePrefs && (
+              <Badge variant="secondary" className="ml-1 tabular">
+                {activePrefsCount}
+              </Badge>
+            )}
           </Button>
         </section>
 
