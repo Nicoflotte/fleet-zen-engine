@@ -6,6 +6,7 @@ import {
   ArrowDown,
   ArrowUp,
   Download,
+  RotateCcw,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
