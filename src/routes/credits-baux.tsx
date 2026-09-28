@@ -353,6 +353,7 @@ function LeasesPage() {
               placeholder="Véhicule, immatriculation, organisme…"
               className="pl-9"
               aria-label="Rechercher un contrat"
+              suppressHydrationWarning
             />
           </div>
 
