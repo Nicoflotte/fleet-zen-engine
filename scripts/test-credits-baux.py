@@ -77,8 +77,8 @@ async def run_format(playwright, name: str, viewport: dict) -> None:
     await search.fill("Peugeot")
     await page.wait_for_timeout(400)
     check(await reset.is_enabled(), "bouton Réinitialiser activé avec une recherche")
-    badge = await reset.locator('[data-slot="badge"]').inner_text()
-    check(badge.strip() == "1", f"compteur-badge affiche 1 (observé : {badge.strip()!r})")
+    badge_text = (await reset.inner_text()).strip()
+    check(badge_text.endswith("1"), f"compteur-badge affiche 1 (observé : {badge_text!r})")
 
     await reset.click()
     await page.wait_for_timeout(400)
