@@ -18,6 +18,7 @@ import { Route as ContraventionsRouteImport } from './routes/contraventions'
 import { Route as CreditsBauxRouteImport } from './routes/credits-baux'
 import { Route as DepensesRouteImport } from './routes/depenses'
 import { Route as EquipementsRouteImport } from './routes/equipements'
+import { Route as GedRouteImport } from './routes/ged'
 import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as SinistresRouteImport } from './routes/sinistres'
 import { Route as ConducteursIndexRouteImport } from './routes/conducteurs.index'
@@ -70,6 +71,11 @@ const EquipementsRoute = EquipementsRouteImport.update({
   path: '/equipements',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GedRoute = GedRouteImport.update({
+  id: '/ged',
+  path: '/ged',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocationsRoute = LocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/ged': typeof GedRoute
   '/locations': typeof LocationsRoute
   '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/ged': typeof GedRoute
   '/locations': typeof LocationsRoute
   '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/credits-baux': typeof CreditsBauxRoute
   '/depenses': typeof DepensesRoute
   '/equipements': typeof EquipementsRoute
+  '/ged': typeof GedRoute
   '/locations': typeof LocationsRoute
   '/sinistres': typeof SinistresRoute
   '/conducteurs/$driverId': typeof ConducteursDriverIdRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/credits-baux'
     | '/depenses'
     | '/equipements'
+    | '/ged'
     | '/locations'
     | '/sinistres'
     | '/conducteurs/$driverId'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/credits-baux'
     | '/depenses'
     | '/equipements'
+    | '/ged'
     | '/locations'
     | '/sinistres'
     | '/conducteurs/$driverId'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/credits-baux'
     | '/depenses'
     | '/equipements'
+    | '/ged'
     | '/locations'
     | '/sinistres'
     | '/conducteurs/$driverId'
@@ -217,6 +229,7 @@ export interface RootRouteChildren {
   CreditsBauxRoute: typeof CreditsBauxRoute
   DepensesRoute: typeof DepensesRoute
   EquipementsRoute: typeof EquipementsRoute
+  GedRoute: typeof GedRoute
   LocationsRoute: typeof LocationsRoute
   SinistresRoute: typeof SinistresRoute
   ConducteursDriverIdRoute: typeof ConducteursDriverIdRoute
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ged': {
+      id: '/ged'
+      path: '/ged'
+      fullPath: '/ged'
+      preLoaderRoute: typeof GedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/locations': {
       id: '/locations'
       path: '/locations'
@@ -345,6 +365,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreditsBauxRoute: CreditsBauxRoute,
   DepensesRoute: DepensesRoute,
   EquipementsRoute: EquipementsRoute,
+  GedRoute: GedRoute,
   LocationsRoute: LocationsRoute,
   SinistresRoute: SinistresRoute,
   ConducteursDriverIdRoute: ConducteursDriverIdRoute,
