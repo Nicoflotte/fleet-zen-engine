@@ -55,7 +55,7 @@ const suiviItems: NavItem[] = [
 
 const pilotageItems: NavItem[] = [
   { title: "Alertes", url: "/alertes", icon: Sparkle, ready: true },
-  { title: "GED", url: "/ged", icon: FolderOpen, ready: false },
+  { title: "GED", url: "/ged", icon: FolderOpen, ready: true },
   { title: "KPI & Reporting", url: "/kpi", icon: BarChart3, ready: false },
 ];
 
