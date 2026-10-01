@@ -81,7 +81,7 @@ function GedPage() {
   const { entities, vehicles, drivers, entityName, vehiclePlate, driverName } = useFleet();
   const [ready, setReady] = useState(false);
   const [users, setUsers] = useState<GedUser[]>(seedGedUsers);
-  const [currentId, setCurrentId] = useState(seedGedUsers[0].id);
+  const [currentId, setCurrentId] = useState(seedGedUsers[0]!.id);
   const [docs, setDocs] = useState<GedDoc[]>([]);
   const [storagePath, setStoragePath] = useState("C:\\FleetManager\\GED");
   const [search, setSearch] = useState("");
@@ -91,7 +91,7 @@ function GedPage() {
 
   useEffect(() => {
     setUsers(load(LS_USERS, seedGedUsers));
-    setCurrentId(load(LS_CURRENT, seedGedUsers[0].id));
+    setCurrentId(load(LS_CURRENT, seedGedUsers[0]!.id));
     setDocs(load<GedDoc[]>(LS_DOCS, []));
     setStoragePath(load(LS_PATH, "C:\\FleetManager\\GED"));
     setReady(true);
@@ -123,7 +123,10 @@ function GedPage() {
   }, [docs, viewable, showArchived, entityFilter, search, vehiclePlate]);
 
   const toggleArchive = (doc: GedDoc) => {
-    if (!can(me, "archiver", doc.entityId)) return toast.error("Vous n'avez pas le droit d'archiver ce document.");
+    if (!can(me, "archiver", doc.entityId)) {
+      toast.error("Vous n'avez pas le droit d'archiver ce document.");
+      return;
+    }
     setDocs((prev) => prev.map((d) => (d.id === doc.id ? { ...d, archived: !d.archived } : d)));
     toast.success(doc.archived ? "Document restauré" : "Document archivé");
   };
@@ -318,7 +321,10 @@ function GedPage() {
         drivers={drivers.filter((d) => !d.archived)}
         storagePath={storagePath}
         onSubmit={(doc) => {
-          if (!can(me, "deposer", doc.entityId)) return toast.error("Dépôt refusé pour cette société.");
+          if (!can(me, "deposer", doc.entityId)) {
+            toast.error("Dépôt refusé pour cette société.");
+            return;
+          }
           setDocs((prev) => [{ ...doc, uploadedBy: me?.name ?? "—" }, ...prev]);
           toast.success("Document déposé");
         }}
@@ -498,7 +504,7 @@ function UploadDialog({
   onSubmit: (doc: GedDoc) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
-  const [type, setType] = useState(docTypes[0]);
+  const [type, setType] = useState<string>(docTypes[0]!);
   const [entityId, setEntityId] = useState("");
   const [vehicleId, setVehicleId] = useState("__none__");
   const [driverId, setDriverId] = useState("__none__");
@@ -509,8 +515,14 @@ function UploadDialog({
   }, [open, allowedEntities]);
 
   const submit = () => {
-    if (!file) return toast.error("Choisissez un fichier.");
-    if (!entityId) return toast.error("Choisissez une société.");
+    if (!file) {
+      toast.error("Choisissez un fichier.");
+      return;
+    }
+    if (!entityId) {
+      toast.error("Choisissez une société.");
+      return;
+    }
     onSubmit({
       id: `doc-${Date.now()}`,
       name: file.name,
