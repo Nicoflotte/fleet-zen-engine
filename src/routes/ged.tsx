@@ -131,6 +131,8 @@ function GedPage() {
     toast.success(doc.archived ? "Document restauré" : "Document archivé");
   };
 
+  if (!ready) return <PageHeader title="GED" subtitle="Chargement…" />;
+
   return (
     <>
       <PageHeader
