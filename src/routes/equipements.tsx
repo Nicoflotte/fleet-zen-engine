@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeEuro, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
+import { RecordFormDialog, type RecordField, type RecordValues } from "@/components/record-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
