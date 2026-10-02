@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BadgeEuro, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
+import { RecordFormDialog, type RecordField, type RecordValues } from "@/components/record-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,18 +44,54 @@ const filters: { value: EquipmentType | "all"; label: string }[] = [
   { value: "badge_ulys", label: equipmentLabels.badge_ulys },
 ];
 
+const createFields: RecordField[] = [
+  {
+    key: "type",
+    label: "Type d'équipement",
+    type: "select",
+    required: true,
+    options: [
+      { value: "carte_dkv", label: equipmentLabels.carte_dkv },
+      { value: "carte_total", label: equipmentLabels.carte_total },
+      { value: "badge_ulys", label: equipmentLabels.badge_ulys },
+    ],
+  },
+  { key: "reference", label: "Référence / numéro", placeholder: "Ex. DKV-45821", required: true },
+  { key: "expiry", label: "Date de validité", type: "date", required: true },
+];
+
 function EquipmentsPage() {
-  const { equipments, vehicleLabel, driverName } = useFleet();
+  const { equipments, vehicleLabel, driverName, addEquipment } = useFleet();
   const [type, setType] = useState<EquipmentType | "all">("all");
 
   const filtered = type === "all" ? equipments : equipments.filter((e) => e.type === type);
   const available = equipments.filter((e) => !e.vehicleId).length;
+
+  const createEquipment = (values: RecordValues) => {
+    const item = addEquipment({
+      type: (values["type"] ?? "carte_dkv") as EquipmentType,
+      reference: (values["reference"] ?? "").trim(),
+      expiry: values["expiry"] ?? "",
+      vehicleId: null,
+      driverId: null,
+    });
+    toast.success(`${equipmentLabels[item.type]} ${item.reference} ajouté au stock`);
+  };
 
   return (
     <>
       <PageHeader
         title="Équipements"
         subtitle={`${equipments.length} équipements · ${available} disponibles au stock`}
+        actions={
+          <RecordFormDialog
+            triggerLabel="Nouvel équipement"
+            title="Nouvel équipement"
+            description="Ajoutez une carte carburant ou un badge télépéage au stock. Il sera ensuite affecté depuis le module Affectations."
+            fields={createFields}
+            onSubmit={createEquipment}
+          />
+        }
       />
 
       <main className="flex-1 space-y-5 px-4 py-6 md:px-8">
