@@ -69,9 +69,9 @@ function EquipmentsPage() {
 
   const createEquipment = (values: RecordValues) => {
     const item = addEquipment({
-      type: values.type as EquipmentType,
-      reference: values.reference.trim(),
-      expiry: values.expiry,
+      type: (values["type"] ?? "carte_dkv") as EquipmentType,
+      reference: (values["reference"] ?? "").trim(),
+      expiry: values["expiry"] ?? "",
       vehicleId: null,
       driverId: null,
     });
