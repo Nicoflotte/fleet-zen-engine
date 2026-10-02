@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -30,14 +30,13 @@ import { equipmentLabels, useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/vehicules/$vehicleId")({
   loader: ({ params }) => {
-    const vehicle = vehicles.find((item) => item.id === params.vehicleId);
-    if (!vehicle) throw notFound();
+    const vehicle = vehicles.find((item) => item.id === params.vehicleId) ?? null;
     return { vehicle };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
+    if (!loaderData?.vehicle) {
       return {
-        meta: [{ title: "Véhicule indisponible — FleetManager AI" }, { name: "robots", content: "noindex" }],
+        meta: [{ title: "Fiche véhicule — FleetManager AI" }, { name: "description", content: "Fiche véhicule : statut, affectation, coûts, échéances et documents." }],
       };
     }
     const { vehicle } = loaderData;
@@ -87,9 +86,21 @@ const documents = [
 ];
 
 function VehicleDetail() {
+  const { vehicleId } = Route.useParams();
   const { vehicle: seed } = Route.useLoaderData();
   const { vehicles, drivers, equipments, agencyName } = useFleet();
-  const vehicle = vehicles.find((item) => item.id === seed.id) ?? seed;
+  const found = vehicles.find((item) => item.id === vehicleId) ?? seed;
+  if (!found) {
+    return (
+      <main className="flex-1 px-4 py-10 md:px-8">
+        <p className="text-sm text-muted-foreground">Véhicule introuvable.</p>
+        <Button variant="outline" size="sm" className="mt-4" asChild>
+          <Link to="/vehicules">Retour au parc</Link>
+        </Button>
+      </main>
+    );
+  }
+  const vehicle = found;
   const linkedDriver = drivers.find((d) => d.vehicleId === vehicle.id) ?? null;
   const linkedEquipments = equipments.filter((e) => e.vehicleId === vehicle.id);
 
