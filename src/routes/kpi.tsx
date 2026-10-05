@@ -123,7 +123,7 @@ function KpiPage() {
     insurancePolicies.filter((p) => !p.archived && inEntity(p.entityId))
       .forEach((p) => deadlines.push({ date: p.renewal, label: `${p.insurer} — ${p.policyNumber}`, kind: "Renouvellement assurance" }));
     const upcoming = deadlines
-      .filter((d) => d.date && daysUntil(d.date) <= 90)
+      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90; })
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 12);
 
@@ -312,7 +312,7 @@ function KpiPage() {
               </TableHeader>
               <TableBody>
                 {data.upcoming.map((d, i) => {
-                  const days = daysUntil(d.date);
+                  const days = Number(daysUntil(d.date));
                   return (
                     <TableRow key={i}>
                       <TableCell>{shortDate(d.date)}</TableCell>
