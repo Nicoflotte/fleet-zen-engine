@@ -85,8 +85,8 @@ function KpiPage() {
         row[t] = exp.filter((e) => e.month === key && e.type === t).reduce((s, e) => s + e.amount, 0);
       });
       const pkey = `${year - 1}-${String(i + 1).padStart(2, "0")}`;
-      row.current = exp.filter((e) => e.month === key).reduce((s, e) => s + e.amount, 0);
-      row.previous = prev.filter((e) => e.month === pkey).reduce((s, e) => s + e.amount, 0);
+      row["current"] = exp.filter((e) => e.month === key).reduce((s, e) => s + e.amount, 0);
+      row["previous"] = prev.filter((e) => e.month === pkey).reduce((s, e) => s + e.amount, 0);
       return row;
     });
 
