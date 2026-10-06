@@ -35,9 +35,10 @@ import {
 import { useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/kpi")({
-  validateSearch: (search: Record<string, unknown>): { year: number; entity: string } => ({
+  validateSearch: (search: Record<string, unknown>): { year: number; entity: string; grace: number } => ({
     year: availableYears.includes(Number(search["year"])) ? Number(search["year"]) : 2026,
     entity: typeof search["entity"] === "string" && search["entity"] ? search["entity"] : "all",
+    grace: [7, 15, 30, 60, 90].includes(Number(search["grace"])) ? Number(search["grace"]) : 30,
   }),
   head: () => ({
     meta: [
@@ -58,7 +59,7 @@ const LAST_MONTH = 8; // données disponibles jusqu'à août 2026
 const k = (v: number) => `${Math.round(v / 1000)} k€`;
 
 function KpiPage() {
-  const { year, entity } = Route.useSearch();
+  const { year, entity, grace } = Route.useSearch();
   const navigate = useNavigate({ from: "/kpi" });
   const fleet = useFleet();
   const { entities, vehicles, claims, fines, leases, insurancePolicies, expenses, rentals, entityIdOfAgency, entityName } = fleet;
