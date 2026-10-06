@@ -60,7 +60,7 @@ const LAST_MONTH = 8; // données disponibles jusqu'à août 2026
 const k = (v: number) => `${Math.round(v / 1000)} k€`;
 
 function KpiPage() {
-  const { year, entity, grace } = Route.useSearch();
+  const { year, entity, grace, horizon } = Route.useSearch();
   const navigate = useNavigate({ from: "/kpi" });
   const fleet = useFleet();
   const { entities, vehicles, claims, fines, leases, insurancePolicies, expenses, rentals, entityIdOfAgency, entityName } = fleet;
