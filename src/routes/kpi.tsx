@@ -35,7 +35,7 @@ import {
 import { useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/kpi")({
-  validateSearch: (search: Record<string, unknown>): { year: number; entity: string; grace: number } => ({
+  validateSearch: (search: Record<string, unknown>): { year: number; entity: string; grace: number; horizon: number } => ({
     year: availableYears.includes(Number(search["year"])) ? Number(search["year"]) : 2026,
     entity: typeof search["entity"] === "string" && search["entity"] ? search["entity"] : "all",
     grace: [7, 15, 30, 60, 90].includes(Number(search["grace"])) ? Number(search["grace"]) : 30,
