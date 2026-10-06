@@ -124,7 +124,7 @@ function KpiPage() {
     insurancePolicies.filter((p) => !p.archived && inEntity(p.entityId))
       .forEach((p) => deadlines.push({ date: p.renewal, label: `${p.insurer} — ${p.policyNumber}`, kind: "Renouvellement assurance" }));
     const upcoming = deadlines
-      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90; })
+      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90 && n >= -grace; })
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 12);
 
@@ -152,7 +152,7 @@ function KpiPage() {
     { label: "Contraventions", value: String(data.fi.length), hint: `${data.finesToDesignate} à désigner`, warn: data.finesToDesignate > 0 },
   ];
 
-  const setSearch = (patch: Partial<{ year: number; entity: string }>) =>
+  const setSearch = (patch: Partial<{ year: number; entity: string; grace: number }>) =>
     navigate({ search: (prev) => ({ ...prev, ...patch }) });
 
   const exportReport = () =>
@@ -183,6 +183,12 @@ function KpiPage() {
               <SelectContent>
                 <SelectItem value="all">Toutes les sociétés</SelectItem>
                 {entities.map((e) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={String(grace)} onValueChange={(v) => setSearch({ grace: Number(v) })}>
+              <SelectTrigger className="w-44" aria-label="Échéances dépassées"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[7, 15, 30, 60, 90].map((g) => <SelectItem key={g} value={String(g)}>Dépassées de {g} j max</SelectItem>)}
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm" onClick={exportReport}><Download /> Exporter</Button>
