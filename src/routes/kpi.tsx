@@ -39,6 +39,7 @@ export const Route = createFileRoute("/kpi")({
     year: availableYears.includes(Number(search["year"])) ? Number(search["year"]) : 2026,
     entity: typeof search["entity"] === "string" && search["entity"] ? search["entity"] : "all",
     grace: [7, 15, 30, 60, 90].includes(Number(search["grace"])) ? Number(search["grace"]) : 30,
+    horizon: [15, 30, 60, 90, 180, 365].includes(Number(search["horizon"])) ? Number(search["horizon"]) : 90,
   }),
   head: () => ({
     meta: [
@@ -123,10 +124,10 @@ function KpiPage() {
       .forEach((l) => deadlines.push({ date: l.end, label: `${l.plate} — ${l.vehicleLabel}`, kind: l.type === "loa" ? "Fin de LOA" : "Fin de crédit-bail" }));
     insurancePolicies.filter((p) => !p.archived && inEntity(p.entityId))
       .forEach((p) => deadlines.push({ date: p.renewal, label: `${p.insurer} — ${p.policyNumber}`, kind: "Renouvellement assurance" }));
-    const upcoming = deadlines
-      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90 && n >= -grace; })
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 12);
+    const allDeadlines = deadlines
+      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= horizon && n >= -grace; })
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const upcoming = allDeadlines.slice(0, 12);
 
     const monthlyRents = leases.filter((l) => !l.archived && inEntity(l.entityId) && l.status !== "solde" && l.status !== "resilie")
       .reduce((s, l) => s + l.monthlyRent, 0);
