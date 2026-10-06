@@ -308,10 +308,10 @@ function KpiPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Échéances des 90 prochains jours</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Échéances des 90 prochains jours</CardTitle><p className="text-xs text-muted-foreground">Échéances dépassées affichées jusqu'à {grace} jours.</p></CardHeader>
         <CardContent className="overflow-x-auto">
           {data.upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucune échéance dans les 90 prochains jours.</p>
+            <p className="text-sm text-muted-foreground">Aucune échéance dans les {grace} jours passés ou les 90 prochains jours.</p>
           ) : (
             <Table>
               <TableHeader>
