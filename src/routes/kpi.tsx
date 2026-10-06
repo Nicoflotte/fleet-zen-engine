@@ -35,9 +35,10 @@ import {
 import { useFleet } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/kpi")({
-  validateSearch: (search: Record<string, unknown>): { year: number; entity: string } => ({
+  validateSearch: (search: Record<string, unknown>): { year: number; entity: string; grace: number } => ({
     year: availableYears.includes(Number(search["year"])) ? Number(search["year"]) : 2026,
     entity: typeof search["entity"] === "string" && search["entity"] ? search["entity"] : "all",
+    grace: [7, 15, 30, 60, 90].includes(Number(search["grace"])) ? Number(search["grace"]) : 30,
   }),
   head: () => ({
     meta: [
@@ -58,7 +59,7 @@ const LAST_MONTH = 8; // données disponibles jusqu'à août 2026
 const k = (v: number) => `${Math.round(v / 1000)} k€`;
 
 function KpiPage() {
-  const { year, entity } = Route.useSearch();
+  const { year, entity, grace } = Route.useSearch();
   const navigate = useNavigate({ from: "/kpi" });
   const fleet = useFleet();
   const { entities, vehicles, claims, fines, leases, insurancePolicies, expenses, rentals, entityIdOfAgency, entityName } = fleet;
@@ -123,7 +124,7 @@ function KpiPage() {
     insurancePolicies.filter((p) => !p.archived && inEntity(p.entityId))
       .forEach((p) => deadlines.push({ date: p.renewal, label: `${p.insurer} — ${p.policyNumber}`, kind: "Renouvellement assurance" }));
     const upcoming = deadlines
-      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90; })
+      .filter((d) => { const n = d.date ? daysUntil(d.date) : null; return typeof n === "number" && Number.isFinite(n) && n <= 90 && n >= -grace; })
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 12);
 
@@ -137,7 +138,7 @@ function KpiPage() {
       finesToDesignate: fi.filter((f) => f.status === "a_designer").length,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, entity, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
+  }, [year, entity, grace, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
 
   const variation = data.prevTotal ? ((data.total - data.prevTotal) / data.prevTotal) * 100 : 0;
   const claimsCost = data.cl.reduce((s, c) => s + c.cost, 0);
@@ -151,7 +152,7 @@ function KpiPage() {
     { label: "Contraventions", value: String(data.fi.length), hint: `${data.finesToDesignate} à désigner`, warn: data.finesToDesignate > 0 },
   ];
 
-  const setSearch = (patch: Partial<{ year: number; entity: string }>) =>
+  const setSearch = (patch: Partial<{ year: number; entity: string; grace: number }>) =>
     navigate({ search: (prev) => ({ ...prev, ...patch }) });
 
   const exportReport = () =>
@@ -182,6 +183,12 @@ function KpiPage() {
               <SelectContent>
                 <SelectItem value="all">Toutes les sociétés</SelectItem>
                 {entities.map((e) => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={String(grace)} onValueChange={(v) => setSearch({ grace: Number(v) })}>
+              <SelectTrigger className="w-44" aria-label="Échéances dépassées"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[7, 15, 30, 60, 90].map((g) => <SelectItem key={g} value={String(g)}>Dépassées de {g} j max</SelectItem>)}
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm" onClick={exportReport}><Download /> Exporter</Button>
@@ -301,10 +308,10 @@ function KpiPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Échéances des 90 prochains jours</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">Échéances des 90 prochains jours</CardTitle><p className="text-xs text-muted-foreground">Échéances dépassées affichées jusqu'à {grace} jours.</p></CardHeader>
         <CardContent className="overflow-x-auto">
           {data.upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucune échéance dans les 90 prochains jours.</p>
+            <p className="text-sm text-muted-foreground">Aucune échéance dans les {grace} jours passés ou les 90 prochains jours.</p>
           ) : (
             <Table>
               <TableHeader>
