@@ -200,6 +200,14 @@ function KpiPage() {
                 {[7, 15, 30, 60, 90].map((g) => <SelectItem key={g} value={String(g)}>Dépassées de {g} j max</SelectItem>)}
               </SelectContent>
             </Select>
+            <Select value={String(horizon)} onValueChange={(v) => setSearch({ horizon: Number(v) })}>
+              <SelectTrigger className="w-40" aria-label="Échéances à venir"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[15, 30, 60, 90, 180, 365].map((h) => (
+                  <SelectItem key={h} value={String(h)}>{h === 365 ? "À venir : 1 an" : `À venir : ${h} j`}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button variant="outline" size="sm" onClick={exportReport}><Download /> Exporter</Button>
           </div>
         }
