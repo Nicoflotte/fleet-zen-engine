@@ -325,10 +325,16 @@ function KpiPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Échéances des 90 prochains jours</CardTitle><p className="text-xs text-muted-foreground">Échéances dépassées affichées jusqu'à {grace} jours.</p></CardHeader>
+        <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="space-y-1">
+            <CardTitle className="text-base">Échéances à venir</CardTitle>
+            <p className="text-xs text-muted-foreground">Dépassées de {grace} j max — à venir dans les {horizon === 365 ? "12 prochains mois" : `${horizon} prochains jours`}.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={exportDeadlines} aria-label="Exporter les échéances"><Download /> Exporter</Button>
+        </CardHeader>
         <CardContent className="overflow-x-auto">
           {data.upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucune échéance dans les {grace} jours passés ou les 90 prochains jours.</p>
+            <p className="text-sm text-muted-foreground">Aucune échéance dans les {grace} jours passés ou les {horizon} prochains jours.</p>
           ) : (
             <Table>
               <TableHeader>
