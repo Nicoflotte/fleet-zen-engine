@@ -138,7 +138,7 @@ function KpiPage() {
       finesToDesignate: fi.filter((f) => f.status === "a_designer").length,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, entity, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
+  }, [year, entity, grace, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
 
   const variation = data.prevTotal ? ((data.total - data.prevTotal) / data.prevTotal) * 100 : 0;
   const claimsCost = data.cl.reduce((s, c) => s + c.cost, 0);
