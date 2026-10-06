@@ -133,13 +133,13 @@ function KpiPage() {
       .reduce((s, l) => s + l.monthlyRent, 0);
 
     return {
-      total, prevTotal, fleetCount: fleetV.length, active, cl, fi, monthly, byType, scorecard, upcoming, monthlyRents,
+      total, prevTotal, fleetCount: fleetV.length, active, cl, fi, monthly, byType, scorecard, upcoming, allDeadlines, monthlyRents,
       availability: fleetV.length ? (active / fleetV.length) * 100 : 0,
       perVehicle: fleetV.length ? total / fleetV.length / monthsCount : 0,
       finesToDesignate: fi.filter((f) => f.status === "a_designer").length,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, entity, grace, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
+  }, [year, entity, grace, horizon, expenses, vehicles, claims, fines, leases, insurancePolicies, rentals, entities]);
 
   const variation = data.prevTotal ? ((data.total - data.prevTotal) / data.prevTotal) * 100 : 0;
   const claimsCost = data.cl.reduce((s, c) => s + c.cost, 0);
@@ -153,8 +153,16 @@ function KpiPage() {
     { label: "Contraventions", value: String(data.fi.length), hint: `${data.finesToDesignate} à désigner`, warn: data.finesToDesignate > 0 },
   ];
 
-  const setSearch = (patch: Partial<{ year: number; entity: string; grace: number }>) =>
+  const setSearch = (patch: Partial<{ year: number; entity: string; grace: number; horizon: number }>) =>
     navigate({ search: (prev) => ({ ...prev, ...patch }) });
+
+  const exportDeadlines = () =>
+    exportCsv(`echeances-flotte-${year}`, data.allDeadlines.map((d) => ({
+      Date: shortDate(d.date),
+      Type: d.kind,
+      Objet: d.label,
+      "Délai (jours)": Number(daysUntil(d.date)),
+    })));
 
   const exportReport = () =>
     exportCsv(`reporting-flotte-${year}`, data.scorecard.map((s) => ({
