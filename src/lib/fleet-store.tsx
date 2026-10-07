@@ -353,19 +353,19 @@ const today = () => new Date().toISOString().slice(0, 10);
 export function FleetProvider({ children }: { children: ReactNode }) {
   const [entities] = useState<Entity[]>(() => seedEntities.map((e) => ({ ...e })));
   const [agencies] = useState<Agency[]>(() => seedAgencies.map((a) => ({ ...a })));
-  const [vehicles, setVehicles] = useState<Vehicle[]>(() => seedVehicles.map((v) => ({ ...v })));
-  const [drivers, setDrivers] = useState<Driver[]>(() => seedDrivers.map((d) => ({ ...d })));
-  const [equipments, setEquipments] = useState<Equipment[]>(() => seedEquipments.map((e) => ({ ...e })));
-  const [rentals, setRentals] = useState<Rental[]>(() => seedRentals.map((r) => ({ ...r })));
-  const [claims, setClaims] = useState<Claim[]>(() => seedClaims.map((c) => ({ ...c })));
-  const [fines, setFines] = useState<Fine[]>(() => seedFines.map((f) => ({ ...f })));
-  const [insurancePolicies, setPolicies] = useState<InsurancePolicy[]>(() =>
+  const [vehicles, setVehicles] = usePersisted("fleet.data.vehicles", <Vehicle[]>(() => seedVehicles.map((v) => ({ ...v })));
+  const [drivers, setDrivers] = usePersisted("fleet.data.drivers", <Driver[]>(() => seedDrivers.map((d) => ({ ...d })));
+  const [equipments, setEquipments] = usePersisted("fleet.data.equipments", <Equipment[]>(() => seedEquipments.map((e) => ({ ...e })));
+  const [rentals, setRentals] = usePersisted("fleet.data.rentals", <Rental[]>(() => seedRentals.map((r) => ({ ...r })));
+  const [claims, setClaims] = usePersisted("fleet.data.claims", <Claim[]>(() => seedClaims.map((c) => ({ ...c })));
+  const [fines, setFines] = usePersisted("fleet.data.fines", <Fine[]>(() => seedFines.map((f) => ({ ...f })));
+  const [insurancePolicies, setPolicies] = usePersisted("fleet.data.policies", <InsurancePolicy[]>(() =>
     seedPolicies.map((p) => ({ ...p })),
   );
-  const [leases, setLeases] = useState<Lease[]>(() => seedLeases.map((l) => ({ ...l })));
+  const [leases, setLeases] = usePersisted("fleet.data.leases", <Lease[]>(() => seedLeases.map((l) => ({ ...l })));
 
   const [expenses] = useState<Expense[]>(() => seedExpenses);
-  const [history, setHistory] = useState<HistoryEntry[]>(() => [
+  const [history, setHistory] = usePersisted("fleet.data.history", <HistoryEntry[]>(() => [
     {
       id: "H-1",
       date: "2026-08-04",
