@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   agencies as seedAgencies,
@@ -352,18 +352,18 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 function usePersisted<T>(key: string, init: () => T) {
   const [value, setValue] = useState<T>(init);
-  const loaded = useRef(false);
+  const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(key);
       if (raw) setValue(JSON.parse(raw) as T);
     } catch {}
-    loaded.current = true;
+    setLoaded(true);
   }, [key]);
   useEffect(() => {
-    if (!loaded.current) return;
+    if (!loaded) return;
     try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
-  }, [key, value]);
+  }, [key, value, loaded]);
   return [value, setValue] as const;
 }
 
