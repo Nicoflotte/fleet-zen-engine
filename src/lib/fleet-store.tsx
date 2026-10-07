@@ -350,22 +350,39 @@ const FleetContext = createContext<FleetContextValue | null>(null);
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+function usePersisted<T>(key: string, init: () => T) {
+  const [value, setValue] = useState<T>(init);
+  const loaded = useRef(false);
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (raw) setValue(JSON.parse(raw) as T);
+    } catch {}
+    loaded.current = true;
+  }, [key]);
+  useEffect(() => {
+    if (!loaded.current) return;
+    try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }, [key, value]);
+  return [value, setValue] as const;
+}
+
 export function FleetProvider({ children }: { children: ReactNode }) {
   const [entities] = useState<Entity[]>(() => seedEntities.map((e) => ({ ...e })));
   const [agencies] = useState<Agency[]>(() => seedAgencies.map((a) => ({ ...a })));
-  const [vehicles, setVehicles] = usePersisted("fleet.data.vehicles", <Vehicle[]>(() => seedVehicles.map((v) => ({ ...v })));
-  const [drivers, setDrivers] = usePersisted("fleet.data.drivers", <Driver[]>(() => seedDrivers.map((d) => ({ ...d })));
-  const [equipments, setEquipments] = usePersisted("fleet.data.equipments", <Equipment[]>(() => seedEquipments.map((e) => ({ ...e })));
-  const [rentals, setRentals] = usePersisted("fleet.data.rentals", <Rental[]>(() => seedRentals.map((r) => ({ ...r })));
-  const [claims, setClaims] = usePersisted("fleet.data.claims", <Claim[]>(() => seedClaims.map((c) => ({ ...c })));
-  const [fines, setFines] = usePersisted("fleet.data.fines", <Fine[]>(() => seedFines.map((f) => ({ ...f })));
-  const [insurancePolicies, setPolicies] = usePersisted("fleet.data.policies", <InsurancePolicy[]>(() =>
+  const [vehicles, setVehicles] = usePersisted<Vehicle[]>("fleet.data.vehicles", () => seedVehicles.map((v) => ({ ...v })));
+  const [drivers, setDrivers] = usePersisted<Driver[]>("fleet.data.drivers", () => seedDrivers.map((d) => ({ ...d })));
+  const [equipments, setEquipments] = usePersisted<Equipment[]>("fleet.data.equipments", () => seedEquipments.map((e) => ({ ...e })));
+  const [rentals, setRentals] = usePersisted<Rental[]>("fleet.data.rentals", () => seedRentals.map((r) => ({ ...r })));
+  const [claims, setClaims] = usePersisted<Claim[]>("fleet.data.claims", () => seedClaims.map((c) => ({ ...c })));
+  const [fines, setFines] = usePersisted<Fine[]>("fleet.data.fines", () => seedFines.map((f) => ({ ...f })));
+  const [insurancePolicies, setPolicies] = usePersisted<InsurancePolicy[]>("fleet.data.policies", () =>
     seedPolicies.map((p) => ({ ...p })),
   );
-  const [leases, setLeases] = usePersisted("fleet.data.leases", <Lease[]>(() => seedLeases.map((l) => ({ ...l })));
+  const [leases, setLeases] = usePersisted<Lease[]>("fleet.data.leases", () => seedLeases.map((l) => ({ ...l })));
 
   const [expenses] = useState<Expense[]>(() => seedExpenses);
-  const [history, setHistory] = usePersisted("fleet.data.history", <HistoryEntry[]>(() => [
+  const [history, setHistory] = usePersisted<HistoryEntry[]>("fleet.data.history", () => [
     {
       id: "H-1",
       date: "2026-08-04",
