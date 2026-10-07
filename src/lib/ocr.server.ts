@@ -42,7 +42,21 @@ Renvoie STRICTEMENT un JSON avec ces clés (chaîne vide si absent) :
 }
 Aucun texte hors du JSON.`;
 
-export type ScanKind = "carte_grise" | "permis";
+const FUEL_PROMPT = `Tu analyses une facture ou un relevé de carburant / péage (DKV, TotalEnergies, Shell, AS24, Ulys...).
+Renvoie STRICTEMENT un JSON avec ces clés (chaîne vide si absent) :
+{
+  "supplier": "émetteur : DKV, TotalEnergies, Ulys, Shell...",
+  "cardNumber": "numéro de carte carburant ou badge utilisé (chiffres uniquement, sans espaces)",
+  "plate": "immatriculation du véhicule si mentionnée, format AA-123-AA",
+  "date": "date de transaction ou de facture YYYY-MM-DD",
+  "category": "carburant ou peages",
+  "liters": "volume total en litres, nombre décimal avec point",
+  "amountHt": "montant total HT, nombre décimal avec point",
+  "amountTtc": "montant total TTC, nombre décimal avec point"
+}
+Aucun texte hors du JSON.`;
+
+export type ScanKind = "carte_grise" | "permis" | "facture_carburant";
 
 export async function extractDocument(kind: ScanKind, dataUrl: string) {
   const apiKey = process.env["LOVABLE_API_KEY"];
@@ -60,7 +74,7 @@ export async function extractDocument(kind: ScanKind, dataUrl: string) {
         {
           role: "user",
           content: [
-            { type: "text", text: kind === "carte_grise" ? REGISTRATION_PROMPT : LICENSE_PROMPT },
+            { type: "text", text: kind === "carte_grise" ? REGISTRATION_PROMPT : kind === "permis" ? LICENSE_PROMPT : FUEL_PROMPT },
             { type: "image_url", image_url: { url: dataUrl } },
           ],
         },
