@@ -328,6 +328,7 @@ type FleetContextValue = {
   toggleVehicleArchive: (id: string) => void;
   toggleDriverArchive: (id: string) => void;
   addEquipment: (input: Omit<Equipment, "id" | "archived">) => Equipment;
+  addExpense: (input: Omit<Expense, "id">) => Expense;
   toggleEquipmentArchive: (id: string) => void;
   addRental: (input: Omit<Rental, "id" | "archived">) => Rental;
   toggleRentalArchive: (id: string) => void;
@@ -381,7 +382,8 @@ export function FleetProvider({ children }: { children: ReactNode }) {
   );
   const [leases, setLeases] = usePersisted<Lease[]>("fleet.data.leases", () => seedLeases.map((l) => ({ ...l })));
 
-  const [expenses] = useState<Expense[]>(() => seedExpenses);
+  const [extraExpenses, setExtraExpenses] = usePersisted<Expense[]>("fleet.data.expenses", () => []);
+  const expenses = useMemo(() => [...extraExpenses, ...seedExpenses], [extraExpenses]);
   const [history, setHistory] = usePersisted<HistoryEntry[]>("fleet.data.history", () => [
     {
       id: "H-1",
@@ -616,6 +618,16 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [log],
   );
 
+  const addExpense = useCallback(
+    (input: Omit<Expense, "id">) => {
+      const item: Expense = { ...input, id: newId("EXP") };
+      setExtraExpenses((prev) => [item, ...prev]);
+      log("Dépenses", "Création", `Dépense ${item.supplier ?? ""} ${item.amount} € enregistrée`);
+      return item;
+    },
+    [log],
+  );
+
   const toggleEquipmentArchive = useCallback(
     (id: string) => {
       setEquipments((prev) => prev.map((e) => (e.id === id ? { ...e, archived: !e.archived } : e)));
@@ -778,6 +790,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       toggleVehicleArchive,
       toggleDriverArchive,
       addEquipment,
+      addExpense,
       toggleEquipmentArchive,
       addRental,
       toggleRentalArchive,
@@ -825,6 +838,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       toggleVehicleArchive,
       toggleDriverArchive,
       addEquipment,
+      addExpense,
       toggleEquipmentArchive,
       addRental,
       toggleRentalArchive,
