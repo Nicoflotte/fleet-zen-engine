@@ -590,6 +590,13 @@ export type Expense = {
   entityId: string;
   type: ExpenseType;
   amount: number;
+  vehicleId?: string | null;
+  driverId?: string | null;
+  date?: string;
+  supplier?: string;
+  cardNumber?: string;
+  liters?: number;
+  amountHt?: number;
 };
 
 const expenseSeeds: Record<ExpenseType, number> = {

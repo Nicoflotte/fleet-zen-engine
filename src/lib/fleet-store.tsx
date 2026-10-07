@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 import {
   agencies as seedAgencies,
@@ -328,6 +328,7 @@ type FleetContextValue = {
   toggleVehicleArchive: (id: string) => void;
   toggleDriverArchive: (id: string) => void;
   addEquipment: (input: Omit<Equipment, "id" | "archived">) => Equipment;
+  addExpense: (input: Omit<Expense, "id">) => Expense;
   toggleEquipmentArchive: (id: string) => void;
   addRental: (input: Omit<Rental, "id" | "archived">) => Rental;
   toggleRentalArchive: (id: string) => void;
@@ -350,22 +351,40 @@ const FleetContext = createContext<FleetContextValue | null>(null);
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+function usePersisted<T>(key: string, init: () => T) {
+  const [value, setValue] = useState<T>(init);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (raw) setValue(JSON.parse(raw) as T);
+    } catch {}
+    setLoaded(true);
+  }, [key]);
+  useEffect(() => {
+    if (!loaded) return;
+    try { window.localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }, [key, value, loaded]);
+  return [value, setValue] as const;
+}
+
 export function FleetProvider({ children }: { children: ReactNode }) {
   const [entities] = useState<Entity[]>(() => seedEntities.map((e) => ({ ...e })));
   const [agencies] = useState<Agency[]>(() => seedAgencies.map((a) => ({ ...a })));
-  const [vehicles, setVehicles] = useState<Vehicle[]>(() => seedVehicles.map((v) => ({ ...v })));
-  const [drivers, setDrivers] = useState<Driver[]>(() => seedDrivers.map((d) => ({ ...d })));
-  const [equipments, setEquipments] = useState<Equipment[]>(() => seedEquipments.map((e) => ({ ...e })));
-  const [rentals, setRentals] = useState<Rental[]>(() => seedRentals.map((r) => ({ ...r })));
-  const [claims, setClaims] = useState<Claim[]>(() => seedClaims.map((c) => ({ ...c })));
-  const [fines, setFines] = useState<Fine[]>(() => seedFines.map((f) => ({ ...f })));
-  const [insurancePolicies, setPolicies] = useState<InsurancePolicy[]>(() =>
+  const [vehicles, setVehicles] = usePersisted<Vehicle[]>("fleet.data.vehicles", () => seedVehicles.map((v) => ({ ...v })));
+  const [drivers, setDrivers] = usePersisted<Driver[]>("fleet.data.drivers", () => seedDrivers.map((d) => ({ ...d })));
+  const [equipments, setEquipments] = usePersisted<Equipment[]>("fleet.data.equipments", () => seedEquipments.map((e) => ({ ...e })));
+  const [rentals, setRentals] = usePersisted<Rental[]>("fleet.data.rentals", () => seedRentals.map((r) => ({ ...r })));
+  const [claims, setClaims] = usePersisted<Claim[]>("fleet.data.claims", () => seedClaims.map((c) => ({ ...c })));
+  const [fines, setFines] = usePersisted<Fine[]>("fleet.data.fines", () => seedFines.map((f) => ({ ...f })));
+  const [insurancePolicies, setPolicies] = usePersisted<InsurancePolicy[]>("fleet.data.policies", () =>
     seedPolicies.map((p) => ({ ...p })),
   );
-  const [leases, setLeases] = useState<Lease[]>(() => seedLeases.map((l) => ({ ...l })));
+  const [leases, setLeases] = usePersisted<Lease[]>("fleet.data.leases", () => seedLeases.map((l) => ({ ...l })));
 
-  const [expenses] = useState<Expense[]>(() => seedExpenses);
-  const [history, setHistory] = useState<HistoryEntry[]>(() => [
+  const [extraExpenses, setExtraExpenses] = usePersisted<Expense[]>("fleet.data.expenses", () => []);
+  const expenses = useMemo(() => [...extraExpenses, ...seedExpenses], [extraExpenses]);
+  const [history, setHistory] = usePersisted<HistoryEntry[]>("fleet.data.history", () => [
     {
       id: "H-1",
       date: "2026-08-04",
@@ -599,6 +618,16 @@ export function FleetProvider({ children }: { children: ReactNode }) {
     [log],
   );
 
+  const addExpense = useCallback(
+    (input: Omit<Expense, "id">) => {
+      const item: Expense = { ...input, id: newId("EXP") };
+      setExtraExpenses((prev) => [item, ...prev]);
+      log("Dépenses", "Création", `Dépense ${item.supplier ?? ""} ${item.amount} € enregistrée`);
+      return item;
+    },
+    [log],
+  );
+
   const toggleEquipmentArchive = useCallback(
     (id: string) => {
       setEquipments((prev) => prev.map((e) => (e.id === id ? { ...e, archived: !e.archived } : e)));
@@ -761,6 +790,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       toggleVehicleArchive,
       toggleDriverArchive,
       addEquipment,
+      addExpense,
       toggleEquipmentArchive,
       addRental,
       toggleRentalArchive,
@@ -808,6 +838,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       toggleVehicleArchive,
       toggleDriverArchive,
       addEquipment,
+      addExpense,
       toggleEquipmentArchive,
       addRental,
       toggleRentalArchive,

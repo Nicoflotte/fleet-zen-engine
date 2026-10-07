@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const schema = z.object({
-  kind: z.enum(["carte_grise", "permis"]),
+  kind: z.enum(["carte_grise", "permis", "facture_carburant"]),
   dataUrl: z.string().min(32),
 });
 
