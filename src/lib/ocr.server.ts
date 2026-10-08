@@ -46,6 +46,7 @@ const FUEL_PROMPT = `Tu analyses une facture ou un relevé de carburant / péage
 Renvoie STRICTEMENT un JSON avec ces clés (chaîne vide si absent) :
 {
   "supplier": "émetteur : DKV, TotalEnergies, Ulys, Shell...",
+  "invoiceNumber": "numéro de facture ou de relevé",
   "cardNumber": "numéro de carte carburant ou badge utilisé (chiffres uniquement, sans espaces)",
   "plate": "immatriculation du véhicule si mentionnée, format AA-123-AA",
   "date": "date de transaction ou de facture YYYY-MM-DD",
