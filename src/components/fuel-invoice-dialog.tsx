@@ -137,20 +137,29 @@ export function FuelInvoiceDialog() {
 
   const submit = () => {
     const ttc = Number(form.amountTtc.replace(",", "."));
-    if (!Number.isFinite(ttc) || ttc <= 0) return toast.error("Montant TTC obligatoire");
-    if (form.entityId === NONE) return toast.error("Société obligatoire");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date)) return toast.error("Date obligatoire");
-    const num = (s: string) => (s ? Number(s.replace(",", ".")) : undefined);
+    if (!Number.isFinite(ttc) || ttc <= 0) {
+      toast.error("Montant TTC obligatoire");
+      return;
+    }
+    if (form.entityId === NONE) {
+      toast.error("Société obligatoire");
+      return;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date)) {
+      toast.error("Date obligatoire");
+      return;
+    }
+    const num = (s: string) => Number(s.replace(",", "."));
     addExpense({
       month: form.date.slice(0, 7),
       date: form.date,
       entityId: form.entityId,
       type: form.category,
       amount: ttc,
-      amountHt: num(form.amountHt),
-      liters: num(form.liters),
-      supplier: form.supplier || undefined,
-      cardNumber: form.cardNumber || undefined,
+      ...(form.amountHt ? { amountHt: num(form.amountHt) } : {}),
+      ...(form.liters ? { liters: num(form.liters) } : {}),
+      ...(form.supplier ? { supplier: form.supplier } : {}),
+      ...(form.cardNumber ? { cardNumber: form.cardNumber } : {}),
       vehicleId: form.vehicleId === NONE ? null : form.vehicleId,
       driverId: form.driverId === NONE ? null : form.driverId,
     });
