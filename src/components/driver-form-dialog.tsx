@@ -108,7 +108,7 @@ export function DriverFormDialog() {
     setScanning(true);
     try {
       const dataUrl = await fileToDataUrl(file);
-      const { fields } = await scanDocument({ data: { kind: "permis", dataUrl } });
+      const { fields } = await scanDocument({ data: { kind: "permis", dataUrls: [dataUrl] } });
       applyFields(fields);
       setScanned(true);
       toast.success("Permis analysé", {

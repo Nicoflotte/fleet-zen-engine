@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { FileUp, Loader2, Sparkles } from "lucide-react";
+import { AlertTriangle, FileUp, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fileToDataUrl } from "@/lib/export-csv";
 import { useFleet } from "@/lib/fleet-store";
+import type { Expense } from "@/lib/fleet-data";
+import { findDuplicateInvoices, type InvoiceCandidate } from "@/lib/invoice-duplicates";
 import { scanDocument } from "@/lib/ocr.functions";
 
 const NONE = "__none__";
@@ -25,6 +28,7 @@ const normPlate = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
 type Form = {
   supplier: string;
+  invoiceNumber: string;
   cardNumber: string;
   date: string;
   category: "carburant" | "peages";
@@ -38,6 +42,7 @@ type Form = {
 
 const empty = (): Form => ({
   supplier: "",
+  invoiceNumber: "",
   cardNumber: "",
   date: new Date().toISOString().slice(0, 10),
   category: "carburant",
@@ -50,15 +55,24 @@ const empty = (): Form => ({
 });
 
 export function FuelInvoiceDialog() {
-  const { vehicles, drivers, equipments, entities, entityIdOfAgency, addExpense } = useFleet();
+  const { vehicles, drivers, equipments, entities, entityIdOfAgency, expenses, vehicleLabel, driverName, addExpense } =
+    useFleet();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<Form>(empty);
   const [busy, setBusy] = useState(false);
   const [fileName, setFileName] = useState("");
   const [detected, setDetected] = useState<Set<string>>(new Set());
   const [match, setMatch] = useState("");
+  const [duplicates, setDuplicates] = useState<Expense[]>([]);
+  const [overrideDuplicate, setOverrideDuplicate] = useState(false);
 
-  const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((p) => ({ ...p, [k]: v }));
+  const set = <K extends keyof Form>(k: K, v: Form[K]) => {
+    setForm((p) => ({ ...p, [k]: v }));
+    if (duplicates.length > 0) {
+      setDuplicates([]);
+      setOverrideDuplicate(false);
+    }
+  };
 
   const vehicleOptions = useMemo(() => vehicles.filter((v) => !(v as { archived?: boolean }).archived), [vehicles]);
 
@@ -75,8 +89,17 @@ export function FuelInvoiceDialog() {
     setFileName(file.name);
     setBusy(true);
     try {
-      const dataUrl = await fileToDataUrl(file);
-      const { fields } = await scanDocument({ data: { kind: "facture_carburant", dataUrl } });
+      let dataUrls: string[];
+      let pdfInfo: { pageCount: number; truncated: boolean } | null = null;
+      if (file.type === "application/pdf") {
+        const { pdfToDataUrls } = await import("@/lib/pdf-to-images");
+        const result = await pdfToDataUrls(file);
+        dataUrls = result.dataUrls;
+        pdfInfo = { pageCount: result.pageCount, truncated: result.truncated };
+      } else {
+        dataUrls = [await fileToDataUrl(file)];
+      }
+      const { fields } = await scanDocument({ data: { kind: "facture_carburant", dataUrls } });
       const next = { ...form };
       const found = new Set<string>();
       const put = (k: keyof Form, v?: string) => {
@@ -86,6 +109,7 @@ export function FuelInvoiceDialog() {
         }
       };
       put("supplier", fields["supplier"]);
+      put("invoiceNumber", fields["invoiceNumber"]);
       put("cardNumber", digits(fields["cardNumber"] ?? ""));
       if (/^\d{4}-\d{2}-\d{2}$/.test(fields["date"] ?? "")) put("date", fields["date"]);
       if (fields["category"] === "peages" || fields["category"] === "carburant") put("category", fields["category"]);
@@ -128,6 +152,11 @@ export function FuelInvoiceDialog() {
       setDetected(found);
       setMatch(how ? `Véhicule reconnu via ${how}.` : "Aucun véhicule reconnu : choisis-le ci-dessous.");
       toast.success("Facture analysée — vérifie les champs avant d'enregistrer");
+      if (pdfInfo?.truncated) {
+        toast.warning(
+          `PDF de ${pdfInfo.pageCount} pages : seules les ${dataUrls.length} premières pages sont analysées`,
+        );
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Analyse impossible");
     } finally {
@@ -150,6 +179,19 @@ export function FuelInvoiceDialog() {
       return;
     }
     const num = (s: string) => Number(s.replace(",", "."));
+    const candidate: InvoiceCandidate = {
+      supplier: form.supplier,
+      invoiceNumber: form.invoiceNumber,
+      date: form.date,
+      amount: ttc,
+    };
+    const found = findDuplicateInvoices(expenses, candidate);
+    if (found.length > 0 && !overrideDuplicate) {
+      setDuplicates(found);
+      setOverrideDuplicate(false);
+      toast.warning("Facture potentiellement identique déjà enregistrée — vérifie le doublon");
+      return;
+    }
     addExpense({
       month: form.date.slice(0, 7),
       date: form.date,
@@ -159,6 +201,7 @@ export function FuelInvoiceDialog() {
       ...(form.amountHt ? { amountHt: num(form.amountHt) } : {}),
       ...(form.liters ? { liters: num(form.liters) } : {}),
       ...(form.supplier ? { supplier: form.supplier } : {}),
+      ...(form.invoiceNumber ? { invoiceNumber: form.invoiceNumber } : {}),
       ...(form.cardNumber ? { cardNumber: form.cardNumber } : {}),
       vehicleId: form.vehicleId === NONE ? null : form.vehicleId,
       driverId: form.driverId === NONE ? null : form.driverId,
@@ -173,6 +216,8 @@ export function FuelInvoiceDialog() {
     setDetected(new Set());
     setMatch("");
     setFileName("");
+    setDuplicates([]);
+    setOverrideDuplicate(false);
   };
 
   const mark = (k: string) => (detected.has(k) ? "border-primary/60 bg-primary/5" : "");
@@ -221,6 +266,13 @@ export function FuelInvoiceDialog() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Fournisseur" k="supplier" tag={tag}>
             <Input className={mark("supplier")} value={form.supplier} onChange={(e) => set("supplier", e.target.value)} />
+          </Field>
+          <Field label="N° de facture" k="invoiceNumber" tag={tag}>
+            <Input
+              className={mark("invoiceNumber")}
+              value={form.invoiceNumber}
+              onChange={(e) => set("invoiceNumber", e.target.value)}
+            />
           </Field>
           <Field label="N° de carte / badge" k="cardNumber" tag={tag}>
             <Input className={mark("cardNumber")} value={form.cardNumber} onChange={(e) => set("cardNumber", e.target.value)} />
@@ -286,6 +338,37 @@ export function FuelInvoiceDialog() {
             </Select>
           </Field>
         </div>
+
+        {duplicates.length > 0 && (
+          <div className="mt-2 space-y-3 rounded-lg border border-warning/40 bg-warning/10 p-3">
+            <p className="flex items-start gap-2 text-sm font-medium text-warning-foreground">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+              <span>
+                Doublon potentiel : {duplicates.length} facture(s) déjà enregistrée(s) avec le même fournisseur, la
+                même date et le même montant TTC.
+              </span>
+            </p>
+            <ul className="space-y-1.5">
+              {duplicates.map((e) => (
+                <li key={e.id} className="text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{e.supplier || "—"}</span>
+                  {e.date ? ` · ${e.date}` : ""}
+                  {` · ${e.amount.toFixed(2)} €`}
+                  {e.invoiceNumber ? ` · n° ${e.invoiceNumber}` : ""}
+                  {e.vehicleId ? ` · ${vehicleLabel(e.vehicleId)}` : ""}
+                  {e.driverId ? ` · ${driverName(e.driverId)}` : ""}
+                </li>
+              ))}
+            </ul>
+            <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
+              <Checkbox
+                checked={overrideDuplicate}
+                onCheckedChange={(c) => setOverrideDuplicate(c === true)}
+              />
+              J'autorise l'enregistrement malgré ce doublon
+            </label>
+          </div>
+        )}
 
         <DialogFooter className="mt-2">
           <Button variant="ghost" onClick={() => setOpen(false)}>Annuler</Button>
