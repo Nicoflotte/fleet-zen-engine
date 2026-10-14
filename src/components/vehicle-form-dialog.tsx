@@ -105,7 +105,7 @@ export function VehicleFormDialog() {
     setScanning(true);
     try {
       const dataUrl = await fileToDataUrl(file);
-      const { fields } = await scanDocument({ data: { kind: "carte_grise", dataUrl } });
+      const { fields } = await scanDocument({ data: { kind: "carte_grise", dataUrls: [dataUrl] } });
       setForm((prev) => {
         const next = { ...prev };
         const put = (key: keyof FormState, value?: string) => {

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { FuelInvoiceDialog } from "@/components/fuel-invoice-dialog";
 import { PageHeader } from "@/components/page-header";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -71,6 +72,7 @@ function ExpensesPage() {
         subtitle={`${currency(total)} — ${monthLabels[month - 1]} ${year} · ${
           entity === "all" ? "toutes les sociétés" : entities.find((e) => e.id === entity)?.name
         }`}
+        actions={<FuelInvoiceDialog />}
       />
       <main className="flex-1 space-y-6 px-4 py-6 md:px-8">
         <section className="panel p-5">

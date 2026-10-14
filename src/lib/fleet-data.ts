@@ -594,6 +594,7 @@ export type Expense = {
   driverId?: string | null;
   date?: string;
   supplier?: string;
+  invoiceNumber?: string;
   cardNumber?: string;
   liters?: number;
   amountHt?: number;
