@@ -172,7 +172,10 @@ function EditAgencyDialog({ agency, onClose }: { agency: Agency | null; onClose:
     current && setForm({ ...current, [key]: value });
 
   const save = () => {
-    if (!current || !current.name.trim()) return toast.error("Le nom est obligatoire");
+    if (!current || !current.name.trim()) {
+      toast.error("Le nom est obligatoire");
+      return;
+    }
     updateAgency(current.id, {
       name: current.name.trim(),
       code: current.code.trim(),
