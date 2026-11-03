@@ -48,6 +48,8 @@ export const Route = createFileRoute("/vehicules/")({
       },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { agence?: string } =>
+    typeof s["agence"] === "string" ? { agence: s["agence"] } : {},
   component: VehiclesList,
 });
 
@@ -55,7 +57,8 @@ function VehiclesList() {
   const { vehicles, agencyName, driverOfVehicle, driverName } = useFleet();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<VehicleStatus | "all">("all");
-  const [agency, setAgency] = useState("all");
+  const { agence } = Route.useSearch();
+  const [agency, setAgency] = useState(agence ? agencyName(agence) : "all");
 
   const agencies = useMemo(
     () => Array.from(new Set(vehicles.map((v) => agencyName(v.agencyId)))).sort(),
