@@ -34,6 +34,8 @@ export const Route = createFileRoute("/equipements")({
       },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { agence?: string } =>
+    typeof s["agence"] === "string" ? { agence: s["agence"] } : {},
   component: EquipmentsPage,
 });
 
@@ -61,7 +63,15 @@ const createFields: RecordField[] = [
 ];
 
 function EquipmentsPage() {
-  const { equipments, vehicleLabel, driverName, addEquipment } = useFleet();
+  const { equipments: allEquipments, vehicles, drivers, vehicleLabel, driverName, addEquipment } = useFleet();
+  const { agence } = Route.useSearch();
+  const equipments = agence
+    ? allEquipments.filter(
+        (e) =>
+          vehicles.some((v) => v.id === e.vehicleId && v.agencyId === agence) ||
+          drivers.some((d) => d.id === e.driverId && d.agencyId === agence),
+      )
+    : allEquipments;
   const [type, setType] = useState<EquipmentType | "all">("all");
 
   const filtered = type === "all" ? equipments : equipments.filter((e) => e.type === type);
