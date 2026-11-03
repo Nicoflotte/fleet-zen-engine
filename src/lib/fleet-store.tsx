@@ -312,6 +312,7 @@ type FleetContextValue = {
   expenses: Expense[];
   history: HistoryEntry[];
   agencyName: (agencyId: string) => string;
+  updateAgency: (id: string, patch: Partial<Omit<Agency, "id">>) => void;
   agencyCode: (agencyId: string) => string;
   entityIdOfAgency: (agencyId: string) => string;
   entityName: (entityId: string) => string;
@@ -370,7 +371,12 @@ function usePersisted<T>(key: string, init: () => T) {
 
 export function FleetProvider({ children }: { children: ReactNode }) {
   const [entities] = useState<Entity[]>(() => seedEntities.map((e) => ({ ...e })));
-  const [agencies] = useState<Agency[]>(() => seedAgencies.map((a) => ({ ...a })));
+  const [agencies, setAgencies] = usePersisted<Agency[]>("fleet.data.agencies", () => seedAgencies.map((a) => ({ ...a })));
+  const updateAgency = useCallback(
+    (id: string, patch: Partial<Omit<Agency, "id">>) =>
+      setAgencies((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a))),
+    [setAgencies],
+  );
   const [vehicles, setVehicles] = usePersisted<Vehicle[]>("fleet.data.vehicles", () => seedVehicles.map((v) => ({ ...v })));
   const [drivers, setDrivers] = usePersisted<Driver[]>("fleet.data.drivers", () => seedDrivers.map((d) => ({ ...d })));
   const [equipments, setEquipments] = usePersisted<Equipment[]>("fleet.data.equipments", () => seedEquipments.map((e) => ({ ...e })));
@@ -774,6 +780,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       expenses,
       history,
       agencyName,
+      updateAgency,
       agencyCode,
       entityIdOfAgency,
       entityName,

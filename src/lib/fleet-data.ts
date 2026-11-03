@@ -101,24 +101,24 @@ export const entities: Entity[] = [
 ];
 
 export const agencies: Agency[] = [
-  { id: "MET-06", code: "MET 06", name: "METALUMINE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "MET", manager: "Hélène Vasseur" },
+  { id: "MET-06", code: "MET 06", name: "MET Vallauris", city: "Vallauris", postalCode: "06220", entityId: "MET", manager: "Hélène Vasseur" },
   { id: "ODESA-06", code: "ODESA 06", name: "ODESA Vallauris", city: "Vallauris", postalCode: "06220", entityId: "ODESA", manager: "Marc Ifrah" },
   { id: "ODEV-06", code: "ODEV 06", name: "ODEV Vallauris", city: "Vallauris", postalCode: "06220", entityId: "ODEV", manager: "Julie Ferrand" },
-  { id: "OF-06", code: "OF 06", name: "Omnium Façades Vallauris", city: "Vallauris", postalCode: "06220", entityId: "OF", manager: "Damien Roux" },
-  { id: "OF-11", code: "OF 11", name: "Omnium Façades Narbonne", city: "Narbonne", postalCode: "11100", entityId: "OF", manager: "Sonia Attia" },
-  { id: "OF-13", code: "OF 13", name: "Omnium Façades Marseille", city: "Marseille", postalCode: "13015", entityId: "OF", manager: "Franck Delmas" },
-  { id: "OF-34", code: "OF 34", name: "Omnium Façades Castries", city: "Castries", postalCode: "34160", entityId: "OF", manager: "Laure Mestre" },
-  { id: "OF-83", code: "OF 83", name: "Omnium Façades Toulon", city: "Toulon", postalCode: "83000", entityId: "OF", manager: "Yves Cottin" },
+  { id: "OF-06", code: "OF 06", name: "OF Vallauris", city: "Vallauris", postalCode: "06220", entityId: "OF", manager: "Damien Roux" },
+  { id: "OF-11", code: "OF 11", name: "OF Narbonne", city: "Narbonne", postalCode: "11100", entityId: "OF", manager: "Sonia Attia" },
+  { id: "OF-13", code: "OF 13", name: "OF Marseille", city: "Marseille", postalCode: "13015", entityId: "OF", manager: "Franck Delmas" },
+  { id: "OF-34", code: "OF 34", name: "OF Castries", city: "Castries", postalCode: "34160", entityId: "OF", manager: "Laure Mestre" },
+  { id: "OF-83", code: "OF 83", name: "OF Toulon", city: "Toulon", postalCode: "83000", entityId: "OF", manager: "Yves Cottin" },
   { id: "SATE-06", code: "SATE 06", name: "SATE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "SATE", manager: "Nadège Kruger" },
   { id: "SATE-13", code: "SATE 13", name: "SATE Marseille", city: "Marseille", postalCode: "13011", entityId: "SATE", manager: "Olivier Pons" },
-  { id: "SEE-06", code: "SEE 06", name: "Sud Est Étanchéité Vallauris", city: "Vallauris", postalCode: "06220", entityId: "SEE", manager: "Céline Barré" },
-  { id: "SEE-13", code: "SEE 13", name: "Sud Est Étanchéité Marseille", city: "Marseille", postalCode: "13014", entityId: "SEE", manager: "Rachid Amrani" },
-  { id: "SEE-34", code: "SEE 34", name: "Sud Est Étanchéité Castries", city: "Castries", postalCode: "34160", entityId: "SEE", manager: "Paul Vidal" },
-  { id: "SEE-83", code: "SEE 83", name: "Sud Est Étanchéité Toulon", city: "Toulon", postalCode: "83200", entityId: "SEE", manager: "Marion Estève" },
-  { id: "TCE-06", code: "TCE 06", name: "Omnium Solution TCE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "TCE", manager: "Bruno Lelièvre" },
-  { id: "TCE-13", code: "TCE 13", name: "Omnium Solution TCE Marseille", city: "Marseille", postalCode: "13008", entityId: "TCE", manager: "Karine Nadaud" },
-  { id: "VENTRE-06", code: "VENTRE 06", name: "Entreprise Ventre Vallauris", city: "Vallauris", postalCode: "06220", entityId: "VENTRE", manager: "Serge Ventre" },
-  { id: "VENTRE-13", code: "VENTRE 13", name: "Entreprise Ventre Marseille", city: "Marseille", postalCode: "13003", entityId: "VENTRE", manager: "Amélie Grivot" },
+  { id: "SEE-06", code: "SEE 06", name: "SEE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "SEE", manager: "Céline Barré" },
+  { id: "SEE-13", code: "SEE 13", name: "SEE Marseille", city: "Marseille", postalCode: "13014", entityId: "SEE", manager: "Rachid Amrani" },
+  { id: "SEE-34", code: "SEE 34", name: "SEE Castries", city: "Castries", postalCode: "34160", entityId: "SEE", manager: "Paul Vidal" },
+  { id: "SEE-83", code: "SEE 83", name: "SEE Toulon", city: "Toulon", postalCode: "83200", entityId: "SEE", manager: "Marion Estève" },
+  { id: "TCE-06", code: "TCE 06", name: "TCE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "TCE", manager: "Bruno Lelièvre" },
+  { id: "TCE-13", code: "TCE 13", name: "TCE Marseille", city: "Marseille", postalCode: "13008", entityId: "TCE", manager: "Karine Nadaud" },
+  { id: "VENTRE-06", code: "VENTRE 06", name: "VENTRE Vallauris", city: "Vallauris", postalCode: "06220", entityId: "VENTRE", manager: "Serge Ventre" },
+  { id: "VENTRE-13", code: "VENTRE 13", name: "VENTRE Marseille", city: "Marseille", postalCode: "13003", entityId: "VENTRE", manager: "Amélie Grivot" },
 ];
 
 // --- Parc (hors locations) -------------------------------------------------
