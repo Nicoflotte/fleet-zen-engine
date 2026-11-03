@@ -313,6 +313,7 @@ type FleetContextValue = {
   history: HistoryEntry[];
   agencyName: (agencyId: string) => string;
   updateAgency: (id: string, patch: Partial<Omit<Agency, "id">>) => void;
+  addAgency: (input: Omit<Agency, "id">) => Agency;
   agencyCode: (agencyId: string) => string;
   entityIdOfAgency: (agencyId: string) => string;
   entityName: (entityId: string) => string;
@@ -375,6 +376,14 @@ export function FleetProvider({ children }: { children: ReactNode }) {
   const updateAgency = useCallback(
     (id: string, patch: Partial<Omit<Agency, "id">>) =>
       setAgencies((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a))),
+    [setAgencies],
+  );
+  const addAgency = useCallback(
+    (input: Omit<Agency, "id">) => {
+      const item: Agency = { ...input, id: `AG-${Date.now().toString(36)}` };
+      setAgencies((prev) => [...prev, item]);
+      return item;
+    },
     [setAgencies],
   );
   const [vehicles, setVehicles] = usePersisted<Vehicle[]>("fleet.data.vehicles", () => seedVehicles.map((v) => ({ ...v })));
@@ -781,6 +790,7 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       history,
       agencyName,
       updateAgency,
+      addAgency,
       agencyCode,
       entityIdOfAgency,
       entityName,
@@ -829,6 +839,8 @@ export function FleetProvider({ children }: { children: ReactNode }) {
       expenses,
       history,
       agencyName,
+      updateAgency,
+      addAgency,
       agencyCode,
       entityIdOfAgency,
       entityName,
