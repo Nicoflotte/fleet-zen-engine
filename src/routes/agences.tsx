@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Car, CreditCard, MapPin, Pencil, Search, UserRound, Users } from "lucide-react";
+import { Building2, Car, CreditCard, MapPin, Pencil, Plus, Search, UserRound, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFleet, type Agency } from "@/lib/fleet-store";
 
 export const Route = createFileRoute("/agences")({
@@ -40,6 +41,7 @@ function AgenciesPage() {
   const { entities, agencies, drivers, vehicles, equipments } = useFleet();
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Agency | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -71,6 +73,11 @@ function AgenciesPage() {
       <PageHeader
         title="Agences"
         subtitle={`${agencies.length} agences · ${entities.length} sociétés`}
+        actions={
+          <Button onClick={() => setCreating(true)}>
+            <Plus className="size-4" /> Nouvelle agence
+          </Button>
+        }
       />
 
       <main className="flex-1 space-y-6 px-4 py-6 md:px-8">
@@ -133,6 +140,7 @@ function AgenciesPage() {
       </main>
 
       <EditAgencyDialog agency={editing} onClose={() => setEditing(null)} />
+      <NewAgencyDialog open={creating} onClose={() => setCreating(false)} />
     </>
   );
 }
@@ -217,6 +225,76 @@ function EditAgencyDialog({ agency, onClose }: { agency: Agency | null; onClose:
             Annuler
           </Button>
           <Button onClick={save}>Enregistrer</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+const EMPTY = { entityId: "", name: "", code: "", postalCode: "", city: "", manager: "" };
+
+function NewAgencyDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { entities, addAgency } = useFleet();
+  const [form, setForm] = useState(EMPTY);
+  const close = () => (setForm(EMPTY), onClose());
+
+  const save = () => {
+    if (!form.entityId) return void toast.error("Choisis la société");
+    if (!form.name.trim()) return void toast.error("Le nom est obligatoire");
+    addAgency({
+      entityId: form.entityId,
+      name: form.name.trim(),
+      code: form.code.trim(),
+      postalCode: form.postalCode.trim(),
+      city: form.city.trim(),
+      manager: form.manager.trim(),
+    });
+    toast.success(`Agence « ${form.name.trim()} » créée`);
+    close();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && close()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nouvelle agence</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1 sm:col-span-2">
+            <Label>Société</Label>
+            <Select value={form.entityId} onValueChange={(v) => setForm({ ...form, entityId: v })}>
+              <SelectTrigger aria-label="Société">
+                <SelectValue placeholder="Choisir une société" />
+              </SelectTrigger>
+              <SelectContent>
+                {entities.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {(
+            [
+              ["name", "Nom"],
+              ["code", "Code court"],
+              ["postalCode", "Code postal"],
+              ["city", "Ville"],
+              ["manager", "Responsable"],
+            ] as const
+          ).map(([key, label]) => (
+            <div key={key} className="space-y-1">
+              <Label htmlFor={`new-${key}`}>{label}</Label>
+              <Input id={`new-${key}`} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} />
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={close}>
+            Annuler
+          </Button>
+          <Button onClick={save}>Créer l'agence</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
