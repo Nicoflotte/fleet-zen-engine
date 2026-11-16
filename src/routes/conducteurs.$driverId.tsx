@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { PageHeader } from "@/components/page-header";
+import { DriverEditDialog } from "@/components/driver-edit-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -98,6 +99,7 @@ function DriverDetail() {
             <Badge variant="outline" className={driverStatusTone[driver.status]}>
               {driverStatusLabels[driver.status]}
             </Badge>
+            <DriverEditDialog driver={driver} />
             <Button size="sm" variant="outline" asChild>
               <Link to="/affectations">Gérer l'affectation</Link>
             </Button>
