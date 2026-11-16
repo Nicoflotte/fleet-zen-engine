@@ -522,6 +522,8 @@ export type InsurancePolicy = {
   scope: string;
   vehicles: number;
   annualPremium: number;
+  /** Prime annuelle par véhicule (clé = id véhicule). */
+  vehiclePremiums?: Record<string, number>;
   renewal: string;
   status: PolicyStatus;
   archived: boolean;
